@@ -25,12 +25,33 @@ In summary, we use our datasets to generate "simulated datasets" in which we kno
 
 We first obtain a pool of singlets applying AMULET and the modified Scrublet pipeline on a raw dataset and keeping the common singlets identified by both tools at their default level (excluding the union set of doublets called by both tools). Here we make an assumption that the common singlets are real singlets without doublets.
 
-Apply AMULET on a bam file:
+To apply AMULET on a bam file, you need to add an CB attribute (barcode) to each record of the bam file as AMULET identifies which cell a read belongs to by the CB attribute. Usually bam files from 10X Genomics already have the CB attribute, but ours come from a different platforms. AMULET only accepts coordinate-sorted and works on deduplicated bam file. 
 ```
-# add CB attribute and sort the example deduplicated bam file
-cat <(samtools view -H $path1/data/example.dedup.bam) <(samtools view $path1/data/example.bam | awk 'BEGIN{FS = ":"} {CB = $1} {printf "%s\t%s%s\n", $0, "CB:Z:", CB}') | samtools sort -o $path1/data/example.dedup.srt.bam
+# add CB attribute and sort the deduplicated bam file
+cat <(samtools view -H $temp/data/singlet_pool_generation/AMULET/example.dedup.bam) \
+<(samtools view $temp/data/singlet_pool_generation/AMULET/example.dedup.bam | \
+awk 'BEGIN{FS = ":"} {CB = $1} {printf "%s\t%s%s\n", $0, "CB:Z:", CB}') \
+| samtools sort -o $temp/data/singlet_pool_generation/AMULET/example.dedup.srt.bam
 ```
 
+AMULET needs a barcode to cell_id map in CSV format (e.g., singlecell.csv from CellRanger). We adopt it from our [nuclei metatable](http://renlab.sdsc.edu/yangli/downloads/mousebrain/Supplementary_Tables/Supplementary%20Table%202%20-%20Metatable%20of%20nuclei.tsv.zip).
+```
+cat $yourpath1/metatable.tsv | awk '($2 == "CEMBA180104_4B"){printf "%s,%s\n", $3, "1"}' \
+> $temp/data/singlet_pool_generation/AMULET/singlecell.csv
+```
+
+You also need a text file (included here) documenting all the chromosomes for the species you are analyzing. Then, you are ready to apply AMULET.
+
+Apply the first step of AMULET:
+```
+java -jar $temp/script/AMULET-v1.1_0124/snATACOverlapCounter.jar --forcesorted --iscellidx 1 \
+$temp/data/singlet_pool_generation/AMULET/example.dedup.srt.bam $temp/data/singlet_pool_generation/AMULET/singlecell.csv \
+$temp/data/singlet_pool_generation/AMULET/mouse_autosomes.txt $temp/data/singlet_pool_generation/AMULET/ 
+```
+Apply the second step of AMULET using two resulting files from the first step:
+```
+
+```
 #### Step 2. Simulate doublets
 
 and introducing artificial doublets by randomly selecting 2/11 of nuclei in the dataset and forming nuclei pairs by adding their read count profiles together (repeated 10 times per dataset). 
