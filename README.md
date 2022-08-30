@@ -53,11 +53,14 @@ $temp/data/singlet_pool_generation/AMULET/mouse_autosomes.txt $temp/data/singlet
 Apply the second step of AMULET using two resulting files from the first step:
 ```
 python3 $temp/script/AMULET-v1.1_0124/AMULET.py --rfilter $temp/data/singlet_pool_generation/AMULET/mm10.blacklist.bed \
-$temp/data/singlet_pool_generation/AMULET/Overlaps.txt $temp/data/singlet_pool_generation/AMULET/OverlapSummary.txt \ $temp/data/singlet_pool_generation/AMULET/
+$temp/data/singlet_pool_generation/AMULET/Overlaps.txt $temp/data/singlet_pool_generation/AMULET/OverlapSummary.txt \
+$temp/data/singlet_pool_generation/AMULET/
 ```
 Please refer to [AMULET](https://github.com/UcarLab/AMULET) to see how to interpret the results and identify singlets/doublets.
 
 #### Identify Scrublet doublets
+
+
 
 ### Step 2. Simulate doublets
 
