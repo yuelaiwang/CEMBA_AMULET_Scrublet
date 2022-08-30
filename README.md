@@ -14,16 +14,18 @@ In 2021, [AMULET](https://github.com/UcarLab/AMULET), a read-count based doublet
 **Our results show that [AMULET](https://github.com/UcarLab/AMULET) does not outperform the [modified](https://www.nature.com/articles/s41586-021-03604-1#Sec15) [Scrublet](https://github.com/swolock/scrublet) pipeline on our typical datasets. The reason is that AMULET does a best job on datasets sequenced deeply, like 25K median valid read pairs per nucleus, but that for our datasets is typically 3K~4K.**
 
 ## Workflow
-In summary, we use our datasets to generate "simulated datasets" in which we know to our best capability if a barcode represents a singlet or a doublet. Then we apply both of the tools to each of the simulated datasets. We quantify the performance of a tool by plotting its precision-recall curve for distinguishing between singlets and doublets.
+In summary, we use our datasets to generate "simulated datasets" in which we know to our best capability if a barcode represents a singlet or a doublet. Then we apply both of the tools to each of the simulated datasets. We quantify the performance of a tool by plotting its precision-recall curve for distinguishing between singlets and doublets. We keep the example dataset in this repo is very small just as an demo, so the results do not really mean something.
 
 - [Step 1. Generate a singlet pool](#step-1-generate-a-singlet-pool)
 - [Step 2. Simulate doublets](#step-2-simulate-doublets)
 - [Step 3. Remove doublets on simulated datasets](#step-3-remove-doublets-on-simulated-datasets)
 - [Step 4. Compare between the two tools by PRC and AUPRC](#step-4-compare-between-the-two-tools-by-prc-and-auprc)
 
-#### Step 1. Generate a singlet pool
+### Step 1. Generate a singlet pool
 
 We first obtain a pool of singlets applying AMULET and the modified Scrublet pipeline on a raw dataset and keeping the common singlets identified by both tools at their default level (excluding the union set of doublets called by both tools). Here we make an assumption that the common singlets are real singlets without doublets.
+
+#### Identify AMULET doublets
 
 To apply AMULET on a bam file, you need to add an CB attribute (barcode) to each record of the bam file as AMULET identifies which cell a read belongs to by the CB attribute. Usually bam files from 10X Genomics already have the CB attribute, but ours come from a different platforms. AMULET only accepts coordinate-sorted and works on deduplicated bam file. 
 ```
@@ -50,14 +52,19 @@ $temp/data/singlet_pool_generation/AMULET/mouse_autosomes.txt $temp/data/singlet
 ```
 Apply the second step of AMULET using two resulting files from the first step:
 ```
-
+python3 $temp/script/AMULET-v1.1_0124/AMULET.py --rfilter $temp/data/singlet_pool_generation/AMULET/mm10.blacklist.bed \
+$temp/data/singlet_pool_generation/AMULET/Overlaps.txt $temp/data/singlet_pool_generation/AMULET/OverlapSummary.txt \ $temp/data/singlet_pool_generation/AMULET/
 ```
-#### Step 2. Simulate doublets
+Please refer to [AMULET](https://github.com/UcarLab/AMULET) to see how to interpret the results and identify singlets/doublets.
+
+#### Identify Scrublet doublets
+
+### Step 2. Simulate doublets
 
 and introducing artificial doublets by randomly selecting 2/11 of nuclei in the dataset and forming nuclei pairs by adding their read count profiles together (repeated 10 times per dataset). 
 
-#### Step 3. Remove doublets on simulated datasets
+### Step 3. Remove doublets on simulated datasets
 
 
 
-#### Step 4. Compare between the two tools by PRC and AUPRC
+### Step 4. Compare between the two tools by PRC and AUPRC
