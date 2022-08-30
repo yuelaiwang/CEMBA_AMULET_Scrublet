@@ -1,0 +1,17 @@
+Total Reads:	10000
+Valid Read Pairs:	4355
+Positive:	5000
+Negative:	5000
+Not in chromosome list:	0
+Insert size (<=0 or >900):	0
+Low Mapping Quality Reads (<=30):	21
+Mean Read Length:	50.0
+Mean Insert Size:	133.2833524684271
+SAMTools Flag Checked:	4990
+SAMTools Flag Passed:	4990
+SAMTools Flag Duplicate:	0
+SAMTools Flag Unpaired:	0
+SAMTools Flag Unmapped:	0
+SAMTools Flag Mate Unmapped:	0
+SAMTools Flag Secondary:	0
+SAMTools Flag Reference Mismatch:	0

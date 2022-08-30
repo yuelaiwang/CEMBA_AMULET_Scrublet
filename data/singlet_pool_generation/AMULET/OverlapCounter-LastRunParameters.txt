@@ -1,0 +1,11 @@
+Parameter:	Value
+expectedoverlap:	2
+bambc:	CB
+forcesorted:	true
+bcidx:	0
+cellidx:	0
+iscellidx:	1
+mapqthresh:	30
+maxinsertsize:	900
+startbases:	4
+endbases:	-5
