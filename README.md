@@ -44,9 +44,14 @@ You also need a text file (included here) documenting all the chromosomes for th
 
 Apply the first step of AMULET:
 ```
-java -jar $temp/script/AMULET-v1.1_0124/snATACOverlapCounter.jar --forcesorted --iscellidx 1 $temp/data/singlet_pool_generation/AMULET/example.dedup.srt.bam $temp/data/singlet_pool_generation/AMULET/singlecell.csv $temp/data/singlet_pool_generation/AMULET/mouse_autosomes.txt $temp/data/singlet_pool_generation/AMULET/ 
+java -jar $temp/script/AMULET-v1.1_0124/snATACOverlapCounter.jar --forcesorted --iscellidx 1 \
+$temp/data/singlet_pool_generation/AMULET/example.dedup.srt.bam $temp/data/singlet_pool_generation/AMULET/singlecell.csv \
+$temp/data/singlet_pool_generation/AMULET/mouse_autosomes.txt $temp/data/singlet_pool_generation/AMULET/ 
+```
+Apply the second step of AMULET using two resulting files from the first step:
 ```
 
+```
 #### Step 2. Simulate doublets
 
 and introducing artificial doublets by randomly selecting 2/11 of nuclei in the dataset and forming nuclei pairs by adding their read count profiles together (repeated 10 times per dataset). 
