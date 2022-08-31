@@ -3,7 +3,7 @@ import numpy as np
 import pysam
 import random
 import argparse
-parser = argparse.ArgumentParser(description = "Generate bam files each containing singlets and simulated doublets based on singlets. For example, if there are 8800 singlets, and the proportion is set to be 0.1, then 1600 random singlets would be used to generate 800 doublets, and the final bam file would contain 8000 cells in total. The script will do a trick to generate 10*n percent of heterotypic doublets and (100 - 10n) percent of homotypic doublets in simulation n depending on user input.")
+parser = argparse.ArgumentParser(description = "Generate bam files each containing singlets and simulated doublets merged from singlets. For example, if there are 8800 singlets, and the proportion of doublets is set to be 0.1, then 1600 random singlets would be selected to generate 800 doublets, and the final bam file would contain 8000 cells in total with 7200 singlets and 800 doublets.")
 parser.add_argument('bam', type = str, help='the path to the parent bam file')
 parser.add_argument('annotation', type = str, help = "the path to the annotation file")
 parser.add_argument("classifier", type = str, help = "the column name in the annotation file used to classify cell type for doublet annotation as homo/hetero")
