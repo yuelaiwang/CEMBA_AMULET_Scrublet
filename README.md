@@ -60,6 +60,8 @@ Please refer to [AMULET](https://github.com/UcarLab/AMULET) to see how to interp
 
 #### Identify Scrublet doublets
 
+Start with a snap file object (used by Ren lab). See [here for conversion between a bam file and a snap file](https://github.com/r3fang/SnapATAC/wiki/FAQs#whatissnap)
+
 
 
 ### Step 2. Simulate doublets
