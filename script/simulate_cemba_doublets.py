@@ -38,7 +38,7 @@ def main():
         location = location + '/'
 
     lines = open(singletsFile, 'r').readlines()
-    singlets2 = list(singlet.strip() for singlet in lines)
+    singlets2 = list(singlet.strip() for singlet in lines) # the set of singlets
     overlapSummary = pd.read_csv(summaryFile, sep = '\t')
     # make a dictionary whose keys are barcodes and values are read counts so that when filtering cells with low read counts, there is no need to go through the pandas table every time.
     barcodeReadCounts = dict()
@@ -48,12 +48,11 @@ def main():
         barcodeReadCounts[barcode] = fragmentCounts
     # use the metatable from CEMBA 1.0, restrict the singlet pool to cells in the table only.
     cellType = annotateCellType(annotation, classifier, region)
-    # use annotated cells and cells with a read counts/fragment counts higher than a threshold. This step is important: if a threshold is specified, cells with low read/fragment counts are not included as cells anymore, and they won't affect the background of AMULET in downstream analysis
+    # use annotated cells (cells only in the metatable) and cells with a read counts/fragment counts higher than a threshold. This step is important: if a threshold is specified, cells with low read/fragment counts are not included as cells anymore, and they won't affect the background of AMULET in downstream analysis
     singlets = list() 
     for singlet in singlets2:
         if singlet in cellType and barcodeReadCounts[singlet] >= FCLow and barcodeReadCounts[singlet] <= FCHigh:
             singlets.append(singlet)
-    # code added above to filter cells below the specified read count threshold
 
     # check if user wants to downsample the size of the  singlets
     if singletPoolSize < 100000:
@@ -69,6 +68,7 @@ def main():
             print("trying to down sample to " + str(singletPoolSize) + " number of singlets, but there are only " + str(len(singlets))  + " singlets. Stop downsampling. ")
     else:
         print("no downsampling required by user.")
+    # generate the ground.truth.tsv file
     artificialBarcodes = GenerateBarcodes(singlets, cellType, proportion)
     artificialBarcodes.to_csv(path_or_buf = location + "ground.truth.tsv", sep = '\t')
     '''
@@ -80,7 +80,6 @@ def main():
         singletsToDoublets[artificialBarcodes.loc[index, "singlet1Barcode"]] = artificialBarcodes.loc[index, "doubletBarcode"]
         singletsToDoublets[artificialBarcodes.loc[index, "singlet2Barcode"]] = artificialBarcodes.loc[index, "doubletBarcode"]
     file2 = open(location + "simulated.singlecell.csv", 'w')
-    # uniqueSet = WholeSetOfBarcodes(artificialBarcodes, singlets)
     for barcode in singlets:
         if barcode not in singletsToDoublets:
             line = ",".join([barcode, barcode, "1"]) + '\n'
@@ -95,7 +94,7 @@ def main():
     simulation.close()
     samfile.close()
 
-# take the path to the annotation file and return a dictionary that contains the annotation of majortype of the cells in this region. This function would collect information of the type of simulated doublets, homo/hetero. The type would be reflected in the ground.truth.tsv file.
+# This function takes the path to the annotation file and return a dictionary that maps each cell to its major type. Importantly, singlets not in the metatable would not go to the dictionary. This function would collect information of the type of simulated doublets, homo/hetero. The type would be reflected in the ground.truth.tsv file.
 def annotateCellType(annotationFile, classifier, region) -> dict:
     cellTypeAnnotation = dict() # keys are barcodes, and values are major type
     annotationTable = pd.read_csv(annotationFile, sep = '\t')
