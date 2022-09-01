@@ -62,7 +62,7 @@ Please refer to [AMULET](https://github.com/UcarLab/AMULET) to see how to interp
 
 Start with a snap file object (used by Ren lab). See [here for conversion between a bam file and a snap file](https://github.com/r3fang/SnapATAC/wiki/FAQs#whatissnap)
 
-The following scripts are not disclosed. Please contact us for futher information.
+*The following scripts are not disclosed. Please contact us for futher information.*
 
 First convert the snap file into an R data file and perform QC, filtering out cells with less than 1000 uniquely mapped fragments or tssc less than 10.
 ```
@@ -86,7 +86,17 @@ Rscript /projects/ps-renlab/yangli/scripts/snATACutils/bin/snapATAC.fitDoublets.
 
 This would result in a ".gmat.fitDoublets.txt" file in which each barcode is assigned a doublet score. The higher the score is, the more likely the barcode is to be a doublet.
 
+Last step is to find common singlets identified by both tools, i.e. excluding the union set of doublets found by both tools.
 
+```
+python $temp/script/find_common_singlets.py \
+--meta $temp/data/singlet_pool_generation/Scrublet/$i.qc.filter.meta.txt \
+--scrublet $temp/data/singlet_pool_generation/Scrublet/$i.gmat.fitDoublets.txt \
+--AMULET $temp/data/singlet_pool_generation/AMULET/MultipletBarcodes_01.txt \
+--output $temp/data/singlet_pool_generation/SingletBarcodes_01.txt
+```
+
+The resulting file "SingletBarcodes_01.txt" will serve as the input to step 2.
 
 ### Step 2. Simulate doublets
 
