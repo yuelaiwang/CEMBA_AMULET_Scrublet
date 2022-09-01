@@ -3,10 +3,10 @@ import pandas as pd
 import seaborn as sns
 import argparse
 parser = argparse.ArgumentParser(description = "Find barcodes that are identified as singlets by both AMULET and Scrublet in a cerebrum region.")
-parser.add_argument('--meta', type=str, dest="meta", help='the path to the filtered meta file of the cerebrum region')
-parser.add_argument('--scrublet', type=str, dest="scrublet", help='the path to the file \"gmat.fitDoublets.txt\" ')
-parser.add_argument('--AMULET', type=str, dest="AMULET", help='the path to the file \"MultipletBarcodes_01.txt\"')
-parser.add_argument('--output', type=str, dest= "outfile", help = "the path to the file that stores the singlet barcodes.")
+parser.add_argument('--meta', type=str, required = True, dest="meta", help='the path to the filtered meta file of the cerebrum region')
+parser.add_argument('--scrublet', type=str, required = True, dest="scrublet", help='the path to the file \"gmat.fitDoublets.txt\" ')
+parser.add_argument('--AMULET', type=str, required = True, dest="AMULET", help='the path to the file \"MultipletBarcodes_01.txt\"')
+parser.add_argument('--output', type=str, required = True, dest= "outfile", help = "the path to the file that stores the singlet barcodes.")
 args = parser.parse_args()
 
 def main():
