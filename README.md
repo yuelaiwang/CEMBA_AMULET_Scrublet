@@ -100,7 +100,17 @@ The resulting file "SingletBarcodes_01.txt" will serve as the input to step 2.
 
 ### Step 2. Simulate doublets
 
-and introducing artificial doublets by randomly selecting 2/11 of nuclei in the dataset and forming nuclei pairs by adding their read count profiles together (repeated 10 times per dataset). 
+We introduce artificial doublets by randomly picking 2/11 of nuclei in the dataset and forming nucleus pairs by adding their read count profiles together (repeated 10 times per dataset and thus generating 10 simulated dataset replicates). 
+
+```
+for ((k = 1; k <= 10; k ++))
+do
+python $temp/script/simulate_cemba_doublets.py \
+$temp/data/singlet_pool_generation/AMULET/example.dedup.srt.bam --poolsize 1100 \
+$yourpath1/metatable.tsv MajorType $temp/data/singlet_pool_generation/SingletBarcodes_01.txt \
+$temp/data/singlet_pool_generation/AMULET/OverlapSummary.txt $temp/data/simulated_datasets/dataset${k}
+done
+```
 
 ### Step 3. Remove doublets on simulated datasets
 
