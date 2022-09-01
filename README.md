@@ -56,11 +56,35 @@ python3 $temp/script/AMULET-v1.1_0124/AMULET.py --rfilter $temp/data/singlet_poo
 $temp/data/singlet_pool_generation/AMULET/Overlaps.txt $temp/data/singlet_pool_generation/AMULET/OverlapSummary.txt \
 $temp/data/singlet_pool_generation/AMULET/
 ```
-Please refer to [AMULET](https://github.com/UcarLab/AMULET) to see how to interpret the results and identify singlets/doublets.
+Please refer to [AMULET](https://github.com/UcarLab/AMULET) to see how to interpret the results and identify singlets/doublets. Briefly, a "MultipletProbabilities.txt" will be generated containing a q-value for each barcode being a singlet. The smaller the q-value is, the more likely the barcode is a doublet.
 
 #### Identify Scrublet doublets
 
 Start with a snap file object (used by Ren lab). See [here for conversion between a bam file and a snap file](https://github.com/r3fang/SnapATAC/wiki/FAQs#whatissnap)
+
+The following scripts are not disclosed. Please contact us for futher information.
+
+First convert the snap file into an R data file and perform QC, filtering out cells with less than 1000 uniquely mapped fragments or tssc less than 10.
+```
+Rscript /projects/ps-renlab/yangli/projects/CEMBA/00.data/szu/bin/snapATAC.qc.filter.R \
+-i /projects/ps-renlab/yangli/projects/CEMBA/00.data/4B/CEMBA180104_4B/CEMBA180104_4B.snap \
+--tsse2depth /projects/ren-transposon/home/yangli/projects/CEMBA/00.data/archive/4B/CEMBA180104_4B/processed/stat.txt \
+-o /projects/ps-renlab/yuw044/projects/CEMBA/practice_doublet_removal/compare/gold_standard/CEMBA180104_4B/doublet_removal/Scrublet/CEMBA180104_4B --fragment_num 1000 --tsse_cutoff 10
+```
+
+Then apply the modified Scrublet pipeline.
+```
+Rscript /projects/ps-renlab/yangli/scripts/snATACutils/bin/snapATAC.rmDoublets.R \
+-i /projects/ps-renlab/yuw044/projects/CEMBA/practice_doublet_removal/compare/gold_standard/CEMBA180104_4B/doublet_removal/Scrublet/CEMBA180104_4B.qc.filter.RData \
+--mat gmat --rate 0.08 
+-o /projects/ps-renlab/yuw044/projects/CEMBA/practice_doublet_removal/compare/gold_standard/CEMBA180104_4B/doublet_removal/Scrublet/CEMBA180104_4B.gmat
+Rscript /projects/ps-renlab/yangli/scripts/snATACutils/bin/snapATAC.fitDoublets.R \
+-i /projects/ps-renlab/yuw044/projects/CEMBA/practice_doublet_removal/compare/gold_standard/CEMBA180104_4B/doublet_removal/Scrublet/CEMBA180104_4B.gmat.qc.cluster.RData \
+-m /projects/ps-renlab/yuw044/projects/CEMBA/practice_doublet_removal/compare/gold_standard/CEMBA180104_4B/doublet_removal/Scrublet/CEMBA180104_4B.gmat.rmDoublets.txt \
+-o /projects/ps-renlab/yuw044/projects/CEMBA/practice_doublet_removal/compare/gold_standard/CEMBA180104_4B/doublet_removal/Scrublet/CEMBA180104_4B.gmat
+```
+
+This would result in a ".gmat.fitDoublets.txt" file in which each barcode is assigned a doublet score. The higher the score is, the more likely the barcode is to be a doublet.
 
 
 
