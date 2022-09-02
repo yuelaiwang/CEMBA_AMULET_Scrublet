@@ -142,6 +142,22 @@ This step would generate a bam file of the simulated dataset containing singlets
 
 ### Step 3. Remove doublets on simulated datasets
 
+First run AMULET on each of the simulated datasets
 
+```
+# the first step of AMULET
+java -jar $temp/script/AMULET-v1.1_0124/snATACOverlapCounter.jar --forcesorted \
+--bcidx 1 --cellidx 1 --iscellidx 2 $temp/data/simulated_datasets/dataset1/simulated.bam \
+$temp/data/simulated_datasets/dataset1/singlecell.csv \
+$temp/data/singlet_pool_generation/AMULET/mouse_autosomes.txt \
+$temp/data/simulated_datasets/dataset1/ 
+
+# the second step of AMULET
+python3 $temp/script/AMULET-v1.1_0124/AMULET.py --rfilter \
+$temp/data/singlet_pool_generation/AMULET/mm10.blacklist.bed \
+$temp/data/simulated_datasets/dataset1/Overlaps.txt \
+$temp/data/simulated_datasets/dataset1/OverlapSummary.txt \
+$temp/data/simulated_datasets/dataset1/
+```
 
 ### Step 4. Compare between the two tools by PRC and AUPRC
