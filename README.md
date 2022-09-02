@@ -138,7 +138,7 @@ Optional arguments:
 
 ```--proportion``` A float specifying the proportion of doublets in a simulated dataset (default: 0.1)
 
-
+This step would generate a bam file of the simulated dataset containing singlets and artificial doublets, a ground truth tsv file, and ```singlecell.csv``` file for AMULET input. An example of the ground truth file can be seen here ```$temp/data/simulated_datasets/dataset1/ground.truth.tsv```.
 
 ### Step 3. Remove doublets on simulated datasets
 
