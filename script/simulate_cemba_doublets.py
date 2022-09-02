@@ -13,7 +13,6 @@ parser.add_argument("--fclower", type = int, dest = "low", default = 0, help = "
 parser.add_argument("--fchigher", type = int, dest = "high", default = 100000000, help = "an integer number that the script would only pick cells with a fragment counts below")
 parser.add_argument("--poolsize", type = int, dest = "size", default = 100000, help = "the number of singlets to keep in the pool (when downsampling, need to keep the pool size the same)")
 parser.add_argument('--proportion', type=float, dest="proportion", default = 0.1, help='the proportion of doublets in a simulated dataset')
-parser.add_argument('--homoratio', type = str, dest = "homoratio", default = "False", help = "whether to generate constant homotypic doublet ratio datasets, TRUE means yes and FALSE means no")
 parser.add_argument('location', type=str, help='the location to store generated bam files and corresponding ground truth file of simulated doublet barcodes. The groung truth file will be a 6-column tsv file whose columns are doublet_barcode, singlet1_barcode, singlet2_barcode, singlet1_majortype, singlet2_majortype, and doublet_type.')
 parser.add_argument("--cellID", type = str, default = "Barcode", help = "the column in the CEMBA 1.0 metatable that is used here")
 parser.add_argument('--region', type=str, dest = "region", default = "None", help = 'the region name, e.g.CEMBA171213_4B. This is totally optional, specifying it would speed up the execution of the script a bit.')
@@ -31,7 +30,6 @@ def main():
     proportion = args.proportion
     region = args.region
     classifier = args.classifier
-    homoratio = args.homoratio
     location = args.location
     # cellID = args.cellID
     if not location.endswith('/'):
