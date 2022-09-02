@@ -100,17 +100,45 @@ The resulting file "SingletBarcodes_01.txt" will serve as the input to step 2.
 
 ### Step 2. Simulate doublets
 
-We introduce artificial doublets by randomly picking 2/11 of nuclei in the dataset and forming nucleus pairs by adding their read count profiles together (repeated 10 times per dataset and thus generating 10 simulated dataset replicates). 
+We introduce artificial doublets by randomly picking 2/11 of the nuclei in the dataset and forming nucleus pairs by adding their read count profiles together (repeated 10 times per dataset and thus generating 10 simulated dataset replicates). This will result in a doublet proportion of 10% in each simulated dataset. 
 
+To generate such datasets, use ```$temp/script/simulate_cemba_doublets.py``` and provide the following input arguments:
+
+```BAM``` The path to the parent bam file
+
+```ANNOTATION``` The path to the metatable.tsv file (or other tsv annotation file)
+
+```CELLTYPE``` The column name in the annotation file used to identify cell type; used for doublet type annotation, homotypic/heterotypic
+
+```SINGLETS``` The path to the ```SingletBarcodes_01.txt``` file
+
+```SUMMARY``` The path to the ```OverlapSummary.txt``` file given by running AMULET on the parent bam file
+
+```LOCATION``` The location to store the simulated dataset (bam file) and the ground truth file of artificial doublet barcodes
+
+Example:
 ```
 for ((k = 1; k <= 10; k ++))
 do
-python $temp/script/simulate_cemba_doublets.py \
-$temp/data/singlet_pool_generation/AMULET/example.dedup.srt.bam --poolsize 1100 \
+python $temp/script/simulate_cemba_doublets.py --poolsize 1100 \
+$temp/data/singlet_pool_generation/AMULET/example.dedup.srt.bam \
 $yourpath1/metatable.tsv MajorType $temp/data/singlet_pool_generation/SingletBarcodes_01.txt \
-$temp/data/singlet_pool_generation/AMULET/OverlapSummary.txt $temp/data/simulated_datasets/dataset${k}
+$temp/data/singlet_pool_generation/AMULET/OverlapSummary.txt \
+$temp/data/simulated_datasets/dataset${k}
 done
 ```
+
+Optional arguments:
+
+```--fclower``` An integer number specifying the fragment count lower limit of any singlet going to the singlet pool (default: 0)
+
+```--fchigher``` An integer number specifying the fragment count upper limit of any singlet going to the singlet pool (default: 100000000)
+
+```--poolsize``` An integer specifying the number of singlets to keep in the pool used for downsampling (default: 100000)
+
+```--proportion``` A float specifying the proportion of doublets in a simulated dataset (default: 0.1)
+
+
 
 ### Step 3. Remove doublets on simulated datasets
 
