@@ -56,7 +56,7 @@ python3 $temp/script/AMULET-v1.1_0124/AMULET.py --rfilter $temp/data/singlet_poo
 $temp/data/singlet_pool_generation/AMULET/Overlaps.txt $temp/data/singlet_pool_generation/AMULET/OverlapSummary.txt \
 $temp/data/singlet_pool_generation/AMULET/
 ```
-Please refer to [AMULET](https://github.com/UcarLab/AMULET) to see how to interpret the results and identify singlets/doublets. Briefly, a "MultipletProbabilities.txt" will be generated containing a q-value for each barcode being a singlet. The smaller the q-value is, the more likely the barcode is a doublet.
+Please refer to [AMULET](https://github.com/UcarLab/AMULET) to see how to interpret the results and identify singlets/doublets. Briefly, a ```MultipletProbabilities.txt``` will be generated containing a q-value for each barcode being a singlet. The smaller the q-value is, the more likely the barcode is a doublet.
 
 #### Identify Scrublet doublets
 
@@ -158,6 +158,25 @@ $temp/data/singlet_pool_generation/AMULET/mm10.blacklist.bed \
 $temp/data/simulated_datasets/dataset1/Overlaps.txt \
 $temp/data/simulated_datasets/dataset1/OverlapSummary.txt \
 $temp/data/simulated_datasets/dataset1/
+```
+
+This step would generate the ```MultipletProbabilities.txt``` file containing a q-value for each barcode being a singlet. By comparing the data in this file and the ground truth file, we can clearly calculate AMULET's recall and precision at all possible q-value thresholds.
+
+Then run the modified Scrublet pipeline on each of the simulated datasets. To run the pipeline, first convert each bam file containing a simulated dataset to a snap file.
+
+```
+samtools sort -n -@ 10 -m 1G $temp/data/simulated_datasets/dataset1/simulated.bam \
+-o $temp/data/simulated_datasets/dataset1/simulated.nsrt.bam
+
+snaptools snap-pre --input-file=$temp/data/simulated_datasets/dataset1/simulated.nsrt.bam \
+--output-snap=$temp/data/simulated_datasets/dataset1/simulated.dedup.snap --genome-name=mm10 \
+--genome-size=$temp/data/simulated_datasets/mm10.chrom.sizes --min-mapq=30 --min-flen=50 \ 
+--max-flen=1000 --keep-chrm=TRUE --keep-single=FALSE --keep-secondary=False --overwrite=True \
+--max-num=20000 --min-cov=500 --verbose=True
+
+# add cell by bin matrix to the snap object
+snaptools snap-add-bmat --snap-file=$temp/data/simulated_datasets/dataset1/simulated.dedup.snap \
+--bin-size-list 1000 5000 10000   --verbose=True
 ```
 
 ### Step 4. Compare between the two tools by PRC and AUPRC
