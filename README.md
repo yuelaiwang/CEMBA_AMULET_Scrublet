@@ -17,7 +17,7 @@ In 2021, [AMULET](https://github.com/UcarLab/AMULET), a read-count based doublet
 In summary, we use our datasets to generate "simulated datasets" in which we know to our best capability if a barcode represents a singlet or a doublet. Then we apply both of the tools to each of the simulated datasets. We quantify the performance of a tool by plotting its precision-recall curve for distinguishing between singlets and doublets. We keep the example dataset in this repo is very small just as an demo, so the results do not really mean something.
 
 - [Step 1. Generate a singlet pool](#step-1-generate-a-singlet-pool)
-- [Step 2. Simulate doublets](#step-2-simulate-doublets)
+- [Step 2. Simulatte doublets](#step-2-simulate-doublets)
 - [Step 3. Remove doublets on simulated datasets](#step-3-remove-doublets-on-simulated-datasets)
 - [Step 4. Compare between the two tools by PRC and AUPRC](#step-4-compare-between-the-two-tools-by-prc-and-auprc)
 
@@ -185,8 +185,32 @@ snaptools snap-add-gmat --snap-file=$temp/data/simulated_datasets/dataset1/simul
 --gene-file $temp/data/simulated_datasets/gencode.vM16.geneUp2k.bed    --verbose=True
 ```
 
+The modified Scrublet pipeline needs a ```stat.txt``` file input in which each barcode takes a line. The pipeline collect the fourth column "TSSe" of each barcode and ignores the remaining. Run ```$temp/script/generate.stat.txt.py``` to generate a new ```stat.txt``` file from the parent ```stat.txt``` file. This script assigns a random TSSE between 10~15 to each artificial doublet. Provide the following input arguments:
 
+```STATTXT``` The path to the parent ```stat.txt``` file
+```GROUNDTRUTH``` The path to the ```ground.truth.tsv``` file of the simulated dataset
+
+By default, the script will generate a new ```stat.txt``` file under the same directory as ```GROUNDTRUTH```.
+
+Example:
 ```
-python $bin/generate.stat.txt.py /projects/ren-transposon/home/yangli/projects/CEMBA/00.data/archive/$j/$i/processed/stat.txt $gold/$i/dataset${k}/ground.truth.tsv
+python $temp/script/generate.stat.txt.py $yourpath2/stat.txt \
+$temp/data/simulated_datasets/dataset1/ground.truth.tsv
 ```
+Optional Arguments:
+
+```--location``` The path to the directory that stores the resulting stat.txt file
+
+Then you are ready to run the modified Scrublet pipeline on each of the simulated datasets.
+
+First convert the snap file into an R data file, this time without doing QC as barcodes in the simulated datasets all have passed QC or are artificial doublets
+```
+Rscript /projects/ps-renlab/yangli/projects/CEMBA/00.data/szu/bin/snapATAC.qc.filter.R \
+-i /projects/ps-renlab/yangli/projects/CEMBA/00.data/4B/CEMBA180104_4B/CEMBA180104_4B.snap \
+--tsse2depth /projects/ren-transposon/home/yangli/projects/CEMBA/00.data/archive/4B/CEMBA180104_4B/processed/stat.txt \
+-o /projects/ps-renlab/yuw044/projects/CEMBA/practice_doublet_removal/compare/gold_standard/CEMBA180104_4B/doublet_removal/Scrublet/CEMBA180104_4B --fragment_num 0 --tsse_cutoff 1
+```
+
+Follow the same workflow to [apply the modified scrublet pipeline](#identify-scrublet-doublets). By comparing the resulting file ```XXX.gmat.fitDoublets.txt``` with ```ground.truth.tsv``` file, we can clearly calculate Scrublet's recall and precision at all possible q-value thresholds.
+
 ### Step 4. Compare between the two tools by PRC and AUPRC
