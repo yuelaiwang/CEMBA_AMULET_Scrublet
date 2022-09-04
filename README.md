@@ -214,3 +214,20 @@ Rscript /projects/ps-renlab/yangli/projects/CEMBA/00.data/szu/bin/snapATAC.qc.fi
 Follow the same workflow to [apply the modified scrublet pipeline](#identify-scrublet-doublets). By comparing the resulting file ```XXX.gmat.fitDoublets.txt``` with ```ground.truth.tsv``` file, we can clearly calculate Scrublet's recall and precision at all possible q-value thresholds.
 
 ### Step 4. Compare between the two tools by PRC and AUPRC
+
+We use the ggplot package in R to make PRCs and plot area under PRCs as bar/box plots. 
+
+#### PRC
+
+Run ```$temp/script/calculate_prc_coordinates.py``` to calculate the coordinates for the precision-recall curves. This will result in a [feather file](https://www.rstudio.com/blog/feather/) storing the coordinate information serving as an input to a following R script. Provide the following arguments:
+
+```DATASETS``` The path to a set of simulated datasets (replicates of each other)
+
+Example: 
+```
+for i in `cat $gold/cemba.mop.sample.lst` 
+do j=${i##*_};
+echo ${i}
+python $temp/script/make_prc_curve.py --end 10 $gold/${i}/dataset -f $gold/${i}/${i}_no_cutoff.feather
+done
+```
