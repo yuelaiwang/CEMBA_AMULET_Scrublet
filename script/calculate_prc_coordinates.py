@@ -7,7 +7,7 @@ import feather
 from os.path import exists
 import argparse
 
-parser = argparse.ArgumentParser(description = "Take a set of simulated datasets (replicates of each other), calculate coordinates of the precision-recall curve for each dataset depicting the performance of AMULET and Scrublet, respectively, in order to compare them. Options can be specified to make a panel of preliminary PRCs or store the coordinates into a feather file as an input to R.")
+parser = argparse.ArgumentParser(description = "Take a set of simulated datasets (replicates of each other), calculate coordinates of the precision-recall curve for each dataset depicting the performance of AMULET and Scrublet, respectively, in order to compare them. Store the coordinates into a feather file as an input to R. Options can be specified to make a panel of preliminary PRCs using plt. ")
 parser.add_argument("datasets", type = str, help = "the path to the simulated dataset")
 parser.add_argument("--prefix", type = str, required = False, help = "the prefix of where to store the image file")
 parser.add_argument("--tools", type = int, default = 2, help = "determine how many tools are applied on each simulated dataset, 2 means both, and 1 means AMULET only")
@@ -54,8 +54,8 @@ def GradientCutoffs(pathToSimulatedDatasets):
     for j in range(numberOfDatasets):
         sns.set(font_scale = 1.35)
         f.add_subplot(rowNumber, columnNumber, j + 1)
-        groundTruth = pd.read_csv(pathToSimulatedDatasets + str(j + startingDataset) + "/ground.truth.tsv", sep = '\t')
-        if exists(pathToSimulatedDatasets + str(j + startingDataset) + "/MultipletProbabilities.txt"):
+        groundTruth = pd.read_csv(''.join([pathToSimulatedDatasets, str(j + startingDataset), "/ground.truth.tsv"]), sep = '\t')
+        if exists(''.join([pathToSimulatedDatasets, str(j + startingDataset), "/MultipletProbabilities.txt"])):
             multipletProbabilities = pd.read_csv(pathToSimulatedDatasets + str(j + startingDataset) + "/MultipletProbabilities.txt", sep = '\t')
         else:
             datasetSkipped += 1
@@ -109,16 +109,10 @@ def GradientCutoffs(pathToSimulatedDatasets):
         ax.set_ylim([0, 1])
         ax.set_title("dataset" + str(j + startingDataset))
     plt.subplots_adjust(wspace = 0.3, hspace = 0.3)
-    '''
-    if pathToSimulatedDatasets.endswith('_'):
-        plt.savefig(pathToSimulatedDatasets + "performance_prc.png")
-    else: 
-        plt.savefig('/'.join(pathToSimulatedDatasets.split('/')[:-1]) + "/performance_prc.png")    
-    '''
+    
     if prefix != None:
         plt.savefig(prefix + "performance_prc.png")
-    if feather_path != None:
-        feather.write_dataframe(raw_data_10_datasets, feather_path)
+    feather.write_dataframe(raw_data_10_datasets, feather_path)
     return raw_data_10_datasets
 
 _ = GradientCutoffs(path)
