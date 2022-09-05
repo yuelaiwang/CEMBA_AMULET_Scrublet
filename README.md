@@ -243,13 +243,36 @@ Optional arguments:
 
 Then, make PRC plots by running ```$temp/script/make_prc_plot.R```. The following arguments are required:
 
+```--dir``` the directory that contains the feather files
+
 ```--samples``` the path to the sample.lst file containing the sample name of each parent dataset
+
+```--suffix``` the suffix of each feather file 
 
 ```-o``` the path to the output PRC figure
 
 Example: 
 ```
-Rscript $temp/script/make_prc_plot.R --labels $temp/data/simulated_datasets/cemba.mop.sample.lst \
---dir $mop/feather/cemba/ 
---samples $mop/cemba.mop.sample.lst --suffix _no_cutoff.feather -o $mop/cemba.mop.prc.nocutoff.pdf
+# directly comparing the performance of AMULET and Scrublet on 8 sets of simulated datasets
+Rscript $temp/script/make_prc_plot.R --labels $temp/data/simulated_datasets/simple.cemba.mop.sample.lst \
+--dir $temp/data/simulated_datasets/feather/ --samples $temp/data/simulated_datasets/cemba.mop.sample.lst \
+--suffix _no_cutoff.feather -o $temp/result/performance/cemba.mop.prc.nocutoff.pdf
+
+# illustrating why AMULET does not outperform Scrublet
+Rscript $temp/script/make_prc_plot.R --label $temp/data/simulated_datasets/cemba_mop_combined/uq.lst \
+--row 1 --dir $temp/data/simulated_datasets/cemba_mop_combined/simulated_datasets_rep1 \
+--samples $temp/data/simulated_datasets/cemba_mop_combined/simulated_datasets_rep1/sample.lst \
+--suffix .feather -o $temp/result/why_AMULET_not_good/cemba.mop.combined.rep1.prc.pdf
 ```
+
+Optional Arugments:
+
+```--labels``` the path to the label.lst file. If specified, will be used to label each PRC; otherwise, will label each PRC using ```--samples```
+
+```-n``` the number of simulated datasets (replicates) in the feather file (default: 10)
+
+```--row``` the number of rows in the resulting figure panel (default: 2)
+
+```--column``` the number of columns in the resulting figure panel (default: 4)
+
+#### AUPRC
