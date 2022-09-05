@@ -229,8 +229,12 @@ for i in `cat $temp/data/simulated_datasets/cemba.mop.sample.lst`
 do
 echo ${i}
 python $temp/script/calculate_prc_coordinates.py --end 10 $temp/data/simulated_datasets/${i}/dataset \
--f $temp/data/simulated_datasets/${i}/${i}_no_cutoff.feather
+$temp/data/simulated_datasets/${i}/${i}_no_cutoff.feather
 done
 ```
 
+Optional arguments:
+```--end``` The number of replicates simulated based on a parent bam file (default: 9)
+```--AMULETorder``` A negative integer representing the starting order of magnitude for q-value of AMULET results (default: -20). Sometimes AMULET finds barcodes extremely unlikely to be a singlet, and then this value needs to be adjusted down to probably -40.
+```--scrhigh``` A float between zero and one representing the highest doublet score for Scrublet results (default: 0.8)
 
