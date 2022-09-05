@@ -18,7 +18,7 @@ parser.add_argument("--highqvalue", type = float, default = 1.01, help = "the up
 parser.add_argument("--scrhigh", type = float, default = 0.8, help = "a float between zero and one representing the highest doublet score for Scrublet results")
 parser.add_argument("--scrlow", type = float, default = 0.001, help = "a float between zero and one representing the lowest doublet score for Scrublet results")
 parser.add_argument("--scrstep", type = float, default = -0.002, help = "Scrublet step")
-parser.add_argument("-f", "--feather", type = str, required = False, help = "if specified, output the dataframe as feather format to this path")
+parser.add_argument("feather", type = str, help = "output the dataframe as feather format to this path")
 
 args = parser.parse_args()
 path = args.datasets
