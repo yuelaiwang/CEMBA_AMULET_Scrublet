@@ -219,9 +219,10 @@ We use the ggplot package in R to make PRCs and plot area under PRCs as bar/box 
 
 #### PRC
 
-Run ```$temp/script/calculate_prc_coordinates.py``` to calculate the coordinates for the precision-recall curves. This will result in a [feather file](https://www.rstudio.com/blog/feather/) storing the coordinate information serving as an input to a following R script. Provide the following arguments:
+Run ```$temp/script/calculate_prc_coordinates.py``` to calculate the coordinates for the precision-recall curves. This will result in a [feather file](https://www.rstudio.com/blog/feather/) storing the coordinate information serving as an input to a following R script. Basically a feather file stores a dataframe that can be read by both Python and R. Provide the following arguments:
 
 ```DATASETS``` The path to a set of simulated datasets (replicates of each other)
+```FEATHERPATH``` The path of the resulting feather file
 
 Example: 
 ```
@@ -235,6 +236,20 @@ done
 
 Optional arguments:
 ```--end``` The number of replicates simulated based on a parent bam file (default: 9)
+
 ```--AMULETorder``` A negative integer representing the starting order of magnitude for q-value of AMULET results (default: -20). Sometimes AMULET finds barcodes extremely unlikely to be a singlet, and then this value needs to be adjusted down to probably -40.
+
 ```--scrhigh``` A float between zero and one representing the highest doublet score for Scrublet results (default: 0.8)
 
+Then, make PRC plots by running ```$temp/script/make_prc_plot.R```. The following arguments are required:
+
+```--samples``` the path to the sample.lst file containing the sample name of each parent dataset
+
+```-o``` the path to the output PRC figure
+
+Example: 
+```
+Rscript $temp/script/make_prc_plot.R --labels $temp/data/simulated_datasets/cemba.mop.sample.lst \
+--dir $mop/feather/cemba/ 
+--samples $mop/cemba.mop.sample.lst --suffix _no_cutoff.feather -o $mop/cemba.mop.prc.nocutoff.pdf
+```
