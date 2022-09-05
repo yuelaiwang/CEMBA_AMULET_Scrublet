@@ -19,7 +19,7 @@ In summary, we use our datasets to generate "simulated datasets" in which we kno
 - [Step 1. Generate a singlet pool](#step-1-generate-a-singlet-pool)
 - [Step 2. Simulatte doublets](#step-2-simulate-doublets)
 - [Step 3. Remove doublets on simulated datasets](#step-3-remove-doublets-on-simulated-datasets)
-- [Step 4. Compare between the two tools by PRC and AUPRC](#step-4-compare-between-the-two-tools-by-prc-and-auprc)
+- [Step 4. Compare between the two tools by PRC and AUPRC](#step-4-quantify-the-performance-of-the-two-tools-using-prc-and-auprc)
 
 ### Step 1. Generate a singlet pool
 
@@ -213,7 +213,7 @@ Rscript /projects/ps-renlab/yangli/projects/CEMBA/00.data/szu/bin/snapATAC.qc.fi
 
 Follow the same workflow to [apply the modified scrublet pipeline](#identify-scrublet-doublets). By comparing the resulting file ```XXX.gmat.fitDoublets.txt``` with ```ground.truth.tsv``` file, we can clearly calculate Scrublet's recall and precision at all possible q-value thresholds.
 
-### Step 4. Compare between the two tools by PRC and AUPRC
+### Step 4. Quantify the performance of the two tools using PRC and AUPRC
 
 We use the ggplot package in R to make PRCs and plot area under PRCs as bar/box plots. 
 
@@ -225,9 +225,12 @@ Run ```$temp/script/calculate_prc_coordinates.py``` to calculate the coordinates
 
 Example: 
 ```
-for i in `cat $gold/cemba.mop.sample.lst` 
-do j=${i##*_};
+for i in `cat $temp/data/simulated_datasets/cemba.mop.sample.lst` 
+do
 echo ${i}
-python $temp/script/make_prc_curve.py --end 10 $gold/${i}/dataset -f $gold/${i}/${i}_no_cutoff.feather
+python $temp/script/calculate_prc_coordinates.py --end 10 $temp/data/simulated_datasets/${i}/dataset \
+-f $temp/data/simulated_datasets/${i}/${i}_no_cutoff.feather
 done
 ```
+
+
