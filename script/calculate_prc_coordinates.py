@@ -54,7 +54,7 @@ def GradientCutoffs(pathToSimulatedDatasets):
     for j in range(numberOfDatasets):
         sns.set(font_scale = 1.35)
         f.add_subplot(rowNumber, columnNumber, j + 1)
-        groundTruth = pd.read_csv(pathToSimulatedDatasets +  str(j + startingDataset) + "/ground.truth.tsv", sep = '\t')
+        groundTruth = pd.read_csv(pathToSimulatedDatasets + str(j + startingDataset) + "/ground.truth.tsv", sep = '\t')
         if exists(pathToSimulatedDatasets + str(j + startingDataset) + "/MultipletProbabilities.txt"):
             multipletProbabilities = pd.read_csv(pathToSimulatedDatasets + str(j + startingDataset) + "/MultipletProbabilities.txt", sep = '\t')
         else:
