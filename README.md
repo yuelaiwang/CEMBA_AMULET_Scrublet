@@ -255,7 +255,8 @@ Example:
 ```
 # directly comparing the performance of AMULET and Scrublet on 8 sets of simulated datasets
 Rscript $temp/script/make_prc_plot.R --labels $temp/data/simulated_datasets/simple.cemba.mop.sample.lst \
---dir $temp/data/simulated_datasets/feather/ --samples $temp/data/simulated_datasets/cemba.mop.sample.lst \
+--dir $temp/data/simulated_datasets/feather_collection/ \
+--samples $temp/data/simulated_datasets/cemba.mop.sample.lst \
 --suffix _no_cutoff.feather -o $temp/result/performance/cemba.mop.prc.nocutoff.pdf
 
 # illustrating why AMULET does not outperform Scrublet
