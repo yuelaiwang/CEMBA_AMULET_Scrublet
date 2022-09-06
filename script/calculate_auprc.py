@@ -42,9 +42,9 @@ def main():
         if numberOfTools == 2:
             Scrubletauc.append(auc2)
     '''
-    append to a text file where every two lines represent a set of simulated datasets with the first line representing the AUCs for AMULET and second for Scrublet.
+    write to a text file where every two lines represent a set of simulated datasets with the first line representing the AUCs for AMULET and second for Scrublet.
     '''
-    file1 = open(prefix + ".auc.txt", 'a')
+    file1 = open(prefix + ".auc.txt", 'w')
     for i in range(len(AMULETauc) - 1):
         file1.write(str(AMULETauc[i]))
         file1.write(',')
