@@ -285,25 +285,39 @@ AUPRC bar plots are in ```$temp/result```. Run ```$temp/script/calculate_auprc.p
 
 Example:
 ```
-# recalculate auPRC for simulated datasets from each CEMBA mop region 
-for i in `cat $gold/cemba.mop.sample.lst`;
+# calculate auPRC for simulated datasets based on each CEMBA mop region 
+for i in `cat $temp/data/simulated_datasets/cemba.mop.sample.lst`;
 do 
 echo ${i}
-rm $gold/${i}/prc.auc.txt # the script append to make sure to remove 
-python $bin/calculate_auprc.py $gold/${i}/dataset $gold/${i}/prc
+python $script/calculate_auprc.py $temp/data/simulated_datasets/${i}/dataset \
+$temp/data/simulated_datasets/${i}/prc
 done
 ```
 
+Optional Arguments:
+```--end``` The number of replicates simulated based on a parent bam file (default: 9)
+
+```--AMULETorder``` A negative integer representing the starting order of magnitude for q-value of AMULET results (default: -20). Sometimes AMULET finds barcodes extremely unlikely to be a singlet, and then this value needs to be adjusted down to probably -40.
+
+```--scrhigh``` A float between zero and one representing the highest doublet score for Scrublet results (default: 0.8)
+
+Then combine the prc.auc.txt for simulated datasets from each CEMBA mop region. 
+
 ```
-# combine the prc.auc.txt for simulated datasets from each CEMBA mop region
-for i in `cat $gold/cemba.mop.sample.lst`;
+for i in `cat $temp/data/simulated_datasets/cemba.mop.sample.lst`;
 do 
 echo $i
-cat $gold/${i}/prc.auc.txt >> $gold/cemba.mop.prc.auc.txt
+cat $temp/data/simulated_datasets/${i}/prc.auc.txt >> $temp/data/simulated_datasets/cemba.mop.prc.auc.txt
 done
 ```
 
-Then run ```$temp/script/auprc_to_tsv.py``` to convert the text file to a tsv file for a following R script. Provide the following arguments:
+Then run ```$temp/script/auprc_to_tsv.py``` to convert the combined text file to a tsv file for a following R script. Provide the following arguments:
+
+```AUCTXT``` the path to the combined ```prc.auc.txt``` file
+
+```SAMPLES``` the path to the ```sample.lst``` file
+
+```TOOLS``` the path to the ```tools.lst``` file
 
 
 
