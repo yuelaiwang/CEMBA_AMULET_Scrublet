@@ -335,7 +335,7 @@ The output tsv would serve as an input to the following R ggplot script. Run ```
 
 ```-i```/```--auprc``` the path to the ggplot.tsv file where the first column is sample, the second column is tool, and the third column is auprc
 
-```-o```/```--output``` output file prefix (a ".barplot.pdf" or ".boxplot.pdf" will be automatically appended)
+```-o```/```--output``` output file prefix (a ".barplot.png" or ".boxplot.png" will be automatically appended)
 
 Example:
 
@@ -344,3 +344,5 @@ Rscript $script/plot_auprc.R -i $temp/data/simulated_datasets/cemba.mop.prc.auc.
 --labels $temp/data/simulated_datasets/simple.sample.lst --sig --box --bar \
 -o $temp/result/performance/cemba.mop.auprc.nocutoff
 ```
+
+The figures in the ```result``` directory have been converted pdf format.
