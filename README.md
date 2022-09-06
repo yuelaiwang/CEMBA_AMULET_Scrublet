@@ -219,7 +219,7 @@ We use the ggplot package in R to make PRCs and plot area under PRCs as bar/box 
 
 #### PRC
 
-Run ```$temp/script/calculate_prc_coordinates.py``` to calculate the coordinates for the precision-recall curves. This will result in a [feather file](https://www.rstudio.com/blog/feather/) storing the coordinate information serving as an input to a following R script. Basically a feather file stores a dataframe that can be read by both Python and R. Provide the following arguments:
+PRCs are in ```$temp/result```. Run ```$temp/script/calculate_prc_coordinates.py``` to calculate the coordinates for the precision-recall curves. This will result in a [feather file](https://www.rstudio.com/blog/feather/) storing the coordinate information serving as an input to a following R script. Basically a feather file stores a dataframe that can be read by both Python and R. Provide the following arguments:
 
 ```DATASETS``` The path to a set of simulated datasets (replicates of each other)
 ```FEATHERPATH``` The path of the resulting feather file
@@ -277,3 +277,38 @@ Optional Arugments:
 ```--column``` the number of columns in the resulting figure panel (default: 4)
 
 #### AUPRC
+
+AUPRC bar plots are in ```$temp/result```. Run ```$temp/script/calculate_auprc.py``` to calculate and store the area under the precision-recall curves in a text file. Provide the following arguments:
+
+```DATASETS``` The path to a set of simulated datasets (replicates of each other)
+```PREFIX``` the prefix of where to store the resulting text file (a .txt will be appended automatically to the end of the prefix)
+
+Example:
+```
+# recalculate auPRC for simulated datasets from each CEMBA mop region 
+for i in `cat $gold/cemba.mop.sample.lst`;
+do 
+echo ${i}
+rm $gold/${i}/prc.auc.txt # the script append to make sure to remove 
+python $bin/calculate_auprc.py $gold/${i}/dataset $gold/${i}/prc
+done
+```
+
+```
+# combine the prc.auc.txt for simulated datasets from each CEMBA mop region
+for i in `cat $gold/cemba.mop.sample.lst`;
+do 
+echo $i
+cat $gold/${i}/prc.auc.txt >> $gold/cemba.mop.prc.auc.txt
+done
+```
+
+Then run ```$temp/script/auprc_to_tsv.py``` to convert the text file to a tsv file for a following R script. Provide the following arguments:
+
+
+
+Example:
+
+```
+python $bin/auprc_to_tsv.py --ggplot $gold/cemba.mop.prc.auc.txt $gold/cemba.mop.sample.lst $gold/tools.lst $gold/cemba.mop.prc.auc.ggplot.tsv
+```
