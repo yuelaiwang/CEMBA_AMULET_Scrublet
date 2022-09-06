@@ -319,10 +319,28 @@ Then run ```$temp/script/auprc_to_tsv.py``` to convert the combined text file to
 
 ```TOOLS``` the path to the ```tools.lst``` file
 
+```OUTPUT``` the path of the output file
 
+```--ggplot``` a "store truth" option that asks the script to produce a tsv file for R ggplot instead of for Excel
 
 Example:
 
 ```
-python $bin/auprc_to_tsv.py --ggplot $gold/cemba.mop.prc.auc.txt $gold/cemba.mop.sample.lst $gold/tools.lst $gold/cemba.mop.prc.auc.ggplot.tsv
+python $script/auprc_to_tsv.py --ggplot $temp/data/simulated_datasets/cemba.mop.prc.auc.txt \
+$temp/data/simulated_datasets/cemba.mop.sample.lst $temp/data/simulated_datasets/tools.lst \
+$temp/data/simulated_datasets/cemba.mop.prc.auc.ggplot.tsv
+```
+
+The output tsv would serve as an input to the following R ggplot script. Run ```$temp/plot_auprc.R``` to plot AUPRC as bar/box plots. The following arguments are required:
+
+```-i```/```--auprc``` the path to the ggplot.tsv file where the first column is sample, the second column is tool, and the third column is auprc
+
+```-o```/```--output``` output file prefix (a ".barplot.pdf" or ".boxplot.pdf" will be automatically appended)
+
+Example:
+
+```
+Rscript $script/plot_auprc.R -i $temp/data/simulated_datasets/cemba.mop.prc.auc.ggplot.tsv \
+--labels $temp/data/simulated_datasets/simple.sample.lst --sig --box --bar \
+-o $temp/result/performance/cemba.mop.auprc.nocutoff
 ```
