@@ -345,4 +345,16 @@ Rscript $script/plot_auprc.R -i $temp/data/simulated_datasets/cemba.mop.prc.auc.
 -o $temp/result/performance/cemba.mop.auprc.nocutoff
 ```
 
+Optional Arguments:
+
+```--labels``` the path to the label.lst file. If specified, will be used to label each PRC; otherwise, will label each PRC using ```--samples```
+
+```--sig``` a "store true" option, if specified, add the significance label to the box/bar plot
+
+```--box``` a "store true" option, if specified, generate a box plot
+
+```--bar``` a "store true" option, if specified, generate a bar plot
+
+```-f/--xtickfont``` the font size for xticks (default: 8)
+
 The figures in the ```result``` directory have been converted pdf format.
