@@ -17,7 +17,7 @@ In 2021, [AMULET](https://github.com/UcarLab/AMULET), a read-count based doublet
 In summary, we use our datasets to generate "simulated datasets" in which we know to our best capability if a barcode represents a singlet or a doublet. Then we apply both of the tools to each of the simulated datasets. We quantify the performance of a tool by plotting its precision-recall curve for distinguishing between singlets and doublets. We keep the example dataset in this repo very small just as a demo.
 
 - [Step 1. Generate a singlet pool](#step-1-generate-a-singlet-pool)
-- [Step 2. Simulate doublets](#step-2-simulate-doublets)
+- [Step 2. Simulate datasets containing artificial doublets](#step-2-simulate-doublets)
 - [Step 3. Remove doublets on simulated datasets](#step-3-remove-doublets-on-simulated-datasets)
 - [Step 4. Compare between the two tools by PRC and AUPRC](#step-4-quantify-the-performance-of-the-two-tools-using-prc-and-auprc)
 
