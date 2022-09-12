@@ -21,7 +21,7 @@ path2script=/projects/ps-renlab/yangli/scripts/snATACutils/bin
 
 ### Step 1: Generate a pool of singlets
 
-#### For replications 1 and 2 of regions 2C, 3C, 4B, 5D (no UQ cutoff)
+#### For replications 1 and 2 of regions 2C, 3C, 4B, 5D 
 
 Identify AMULET doublets.
 
@@ -110,7 +110,7 @@ done
 
 #### For the combined MOP datasets replications 1 and 2
 
-For each of the eight cemba mop bam files, modify query name by adding the rep_region information and add CB attribute
+For each of the eight cemba mop bam files, modify query name by adding the rep_region information and add CB attribute so that the barcodes don't collide when merging 2C, 3C, 4B, 5D datasets.
 
 ```
 # replication 1
@@ -161,6 +161,7 @@ done
 ```
 
 Merge the bam files
+
 ```
 echo -e "
 #!/bin/bash
@@ -180,7 +181,7 @@ samtools merge ${cemba_mop}/rep2/CEMBA_MOP.filtered.dedup.bam ${cemba_mop}/rep2/
 qsub $qsub/merge_cemba_mop.qsub -o $gold/cemba_mop/log/merge_cemba_mop.log
 ```
 
-Identify AMULET & Scrublet doublets/singlets & find common singlets identified by both tools ()
+Identify AMULET & Scrublet doublets/singlets & find common singlets identified by both tools 
 
 ```
 # add the rep_region information to and merge the SingletBarcodes_01.txt files for each cemba rep_region to form the equivalent file for rep1/rep2, respectively
@@ -244,9 +245,63 @@ done
 done
 ```
 
+#### For replications 1 and 2 of regions 2C, 3C, 4B, 5D (UQ between 1000 and 4000)
+
+As the pipeline is pretty familiar to us, we include a few more future steps here: running AMULET on each simulated dataset and preparing Scrublet input.
+
+```
+for i in `cat $gold/cemba.mop.sample.lst`;
+do 
+for ((k = 11; k <= 20; k ++));
+do
+echo -e "
+#!/bin/bash
+
+#PBS -q hotel
+#PBS -N sim_$i_$k
+#PBS -l nodes=1:ppn=1,walltime=16:00:00
+#PBS -V
+#PBS -M yuw044@ucsd.edu
+#PBS -m a
+#PBS -A ren-group
+#PBS -j oe
+
+mkdir $gold/$i/dataset${k}
+
+python $bin/simulate_cemba_doublets.py $gold/$i/doublet_removal/AMULET/filtered_dedup.srt.bam --poolsize 1100 --region $i --fclower 1000 --fchigher 4000 /projects/ps-renlab/yuw044/projects/CEMBA/metatable.tsv MajorType $gold/$i/doublet_removal/SingletBarcodes_01.txt $gold/$i/doublet_removal/AMULET/OverlapSummary.txt $gold/$i/dataset${k}
+
+java -jar /projects/ps-renlab/yuw044/apps/AMULET-v1.1_0124/snATACOverlapCounter.jar --forcesorted --bcidx 1 --cellidx 1 --iscellidx 2 $gold/$i/dataset${k}/simulated.bam $gold/$i/dataset${k}/simulated.singlecell.csv ~/projects/CEMBA/practice_doublet_removal/AMULET/testing_10D/input_data/mouse_autosomes.txt $gold/$i/dataset${k}/ &> $gold/$i/log/find_overlaps_$k.log
+
+python3 /projects/ps-renlab/yuw044/apps/AMULET-v1.1_0124/AMULET.py --rfilter ~/projects/CEMBA/practice_doublet_removal/AMULET/testing_10D/input_data/mm10.blacklist.bed $gold/$i/dataset${k}/Overlaps.txt $gold/$i/dataset${k}/OverlapSummary.txt $gold/$i/dataset${k}/ &> $gold/$i/log/multiplet_detection_$k.log
+
+samtools sort -n -@ 10 -m 1G $gold/$i/dataset${k}/simulated.bam -o $gold/$i/dataset${k}/simulated.nsrt.bam
+
+snaptools snap-pre --input-file=$gold/$i/dataset${k}/simulated.nsrt.bam --output-snap=$gold/$i/dataset${k}/simulated.snap --genome-name=mm10 --genome-size=$gold/CEMBA180104_4B_old/simulated_datasets2/mm10.chrom.sizes --min-mapq=30 --min-flen=50 --max-flen=1000 --keep-chrm=TRUE --keep-single=FALSE --keep-secondary=False --overwrite=True --max-num=20000 --min-cov=500 --verbose=True
+
+# add cell by bin matrix to the snap object
+snaptools snap-add-bmat \
+    --snap-file=$gold/$i/dataset${k}/simulated.snap \
+    --bin-size-list 1000 5000 10000 \
+    --verbose=True
+
+/home/yangli1/apps/anaconda2/bin/snaptools snap-add-gmat \
+    --snap-file=$gold/$i/dataset${k}/simulated.snap \
+    --gene-file /projects/ps-renlab/yangli/genome/mm10/gencode.vM16.geneUp2k.bed \
+    --verbose=True
+
+# python $bin/generate.stat.txt.py /projects/ren-transposon/home/yangli/projects/CEMBA/00.data/archive/$j/$i/processed/stat.txt $gold/$i/dataset${k}/ground.truth.tsv
+
+" | sed '1d' > $qsub/cemba_simulate_AMULET_bamtosnap_${i}_${k}.qsub
+
+qsub $qsub/cemba_simulate_AMULET_bamtosnap_${i}_${k}.qsub -o $gold/$i/log/cemba_simulate_AMULET_bamtosnap_${i}_${k}.log
+done
+done
+```
+
 #### For the combined MOP datasets replications 1 and 2
 
 Simulate 10 datasets at each UQ interval (1000-4000, 4000-7000, 7000-10000, 10000-13000)
+
 ```
 for j in rep1 rep2;
 do
@@ -283,11 +338,192 @@ done
 
 #### For replications 1 and 2 of regions 2C, 3C, 4B, 5D (no UQ cutoff)
 
+Run AMULET on each simulated dataset:
+
+```
+for i in `cat $gold/cemba.mop.sample.lst`;
+do 
+for ((k = 1; k <= 10; k ++));
+do
+echo -e "
+#!/bin/bash
+
+#PBS -q hotel
+#PBS -N AMULET_${i}_$k
+#PBS -l nodes=1:ppn=1,walltime=6:00:00
+#PBS -V
+#PBS -M yuw044@ucsd.edu
+#PBS -m a
+#PBS -e $gold/$i/log/AMULET_${k}.err
+#PBS -A ren-group
+#PBS -j oe
+
+java -jar /projects/ps-renlab/yuw044/apps/AMULET-v1.1_0124/snATACOverlapCounter.jar --forcesorted --bcidx 1 --cellidx 1 --iscellidx 2 $gold/$i/dataset${k}/simulated.bam $gold/$i/dataset${k}/simulated.singlecell.csv ~/projects/CEMBA/practice_doublet_removal/AMULET/testing_10D/input_data/mouse_autosomes.txt $gold/$i/dataset${k}/ &> $gold/$i/log/find_overlaps_$k.log
+
+python3 /projects/ps-renlab/yuw044/apps/AMULET-v1.1_0124/AMULET.py --rfilter ~/projects/CEMBA/practice_doublet_removal/AMULET/testing_10D/input_data/mm10.blacklist.bed $gold/$i/dataset${k}/Overlaps.txt $gold/$i/dataset${k}/OverlapSummary.txt $gold/$i/dataset${k}/ &> $gold/$i/log/multiplet_detection_$k.log
+
+" | sed '1d' > $qsub/cemba_AMULET_${i}_${k}.qsub
+
+qsub $qsub/cemba_AMULET_${i}_${k}.qsub -o $gold/$i/log/cemba_AMULET_${k}.log
+done
+done
+```
+
+Prepare the Scrublet pipeline input: convert the bam files to snap files and add cell-by-bin matrix to each of them
+
+```
+for i in `cat $gold/cemba.mop.sample.lst`;
+do 
+for ((k = 1; k <= 10; k ++));
+do
+echo -e "
+#!/bin/bash
+
+#PBS -q hotel
+#PBS -N bamtosnap_$i_$k
+#PBS -l nodes=1:ppn=2,walltime=6:00:00
+#PBS -V
+#PBS -M yuw044@ucsd.edu
+#PBS -m ae
+#PBS -e $gold/$i/log/cemba_bamtosnap_${i}_${k}.err
+#PBS -A ren-group
+#PBS -j oe
+
+samtools sort -n -@ 10 -m 1G $gold/$i/dataset${k}/simulated.bam -o $gold/$i/dataset${k}/simulated.nsrt.bam
+
+snaptools snap-pre --input-file=$gold/$i/dataset${k}/simulated.nsrt.bam --output-snap=$gold/$i/dataset${k}/simulated.dedup.snap --genome-name=mm10 --genome-size=$gold/CEMBA180104_4B_old/simulated_datasets2/mm10.chrom.sizes --min-mapq=30 --min-flen=50 --max-flen=1000 --keep-chrm=TRUE --keep-single=FALSE --keep-secondary=False --overwrite=True --max-num=20000 --min-cov=500 --verbose=True
+
+# add cell by bin matrix to the snap object
+snaptools snap-add-bmat \
+    --snap-file=$gold/$i/dataset${k}/simulated.dedup.snap \
+    --bin-size-list 1000 5000 10000 \
+    --verbose=True
+
+" | sed '1d' > $qsub/cemba_bamtosnap_${i}_${k}.qsub
+
+qsub $qsub/cemba_bamtosnap_${i}_${k}.qsub -o $gold/$i/log/cemba_bamtosnap_${k}.log
+done
+done
+
+# add cell-by-gene matrix to each of them
+for i in `cat $gold/cemba.mop.sample.lst`;
+do j=${i##*_};
+for ((k = 1; k <= 10; k ++));
+do
+echo -e "
+#!/bin/bash
+
+#PBS -q hotel
+#PBS -N addGM_$i_$k
+#PBS -l nodes=1:ppn=1,walltime=6:00:00
+#PBS -V
+#PBS -M yuw044@ucsd.edu
+#PBS -m a
+#PBS -e $gold/$i/log/cemba_addGM_${k}.err
+#PBS -A ren-group
+#PBS -j oe
+
+/home/yangli1/apps/anaconda2/bin/snaptools snap-add-gmat \
+    --snap-file=$gold/$i/dataset${k}/simulated.dedup.snap \
+    --gene-file /projects/ps-renlab/yangli/genome/mm10/gencode.vM16.geneUp2k.bed \
+    --verbose=True
+
+python $bin/generate.stat.txt.py /projects/ren-transposon/home/yangli/projects/CEMBA/00.data/archive/$j/$i/processed/stat.txt $gold/$i/dataset${k}/ground.truth.tsv
+
+" | sed '1d' > $qsub/cemba_addGM_${i}_${k}.qsub
+
+qsub $qsub/cemba_addGM_${i}_${k}.qsub -o $gold/$i/log/cemba_addGM_${k}.log
+done
+done
+```
+
+Run the Scrublet pipeline on each simulated dataset 
+```
+for i in `cat $gold/cemba.mop.sample.lst`;
+do 
+for ((k = 1; k <= 10; k ++));
+do
+echo -e "
+#!/bin/bash
+
+#PBS -q hotel
+#PBS -N Scr_$i_$k
+#PBS -l nodes=1:ppn=1,walltime=3:00:00
+#PBS -V
+#PBS -M yuw044@ucsd.edu
+#PBS -m a
+#PBS -A ren-group
+#PBS -j oe
+
+# generate qc.filter.RData and qc.filter.meta.txt
+Rscript ${path1}/bin/snapATAC.qc.filter.R -i $gold/$i/dataset${k}/simulated.dedup.snap \
+                                        --tsse2depth $gold/$i/dataset${k}/stat.txt \
+                                        -o $gold/$i/dataset${k}/simulated \
+                                        --fragment_num 1 --tsse_cutoff 0 &> $gold/$i/log/qc.filter.$k.log
+
+Rscript $path2script/snapATAC.rmDoublets.R -i $gold/$i/dataset${k}/simulated.qc.filter.RData \
+                                                      --mat gmat --rate 0.08 \
+                                                      -o $gold/$i/dataset${k}/simulated.gmat &> $gold/$i/log/gmat.rmDoublets.$k.log; 
+
+Rscript $path2script/snapATAC.fitDoublets.R -i $gold/$i/dataset${k}/simulated.gmat.qc.cluster.RData \
+                                            -m $gold/$i/dataset${k}/simulated.gmat.rmDoublets.txt \
+                                            -o $gold/$i/dataset${k}/simulated.gmat &> $gold/$i/log/gmat.fitDoublets.$k.log
+
+" | sed '1d' > $qsub/scrublet_${i}_${k}.qsub
+
+qsub $qsub/scrublet_${i}_${k}.qsub -o $gold/$i/log/scrublet_${k}.log 
+done
+done
+```
+
 #### For replications 1 and 2 of regions 2C, 3C, 4B, 5D (UQ between 1000 and 4000)
+
+```
+for i in `cat $gold/cemba.mop.sample.lst`;
+do 
+j=${i##*_}
+for ((k = 11; k <= 20; k ++));
+do
+echo -e "
+#!/bin/bash
+
+#PBS -q hotel
+#PBS -N Scr_$i_$k
+#PBS -l nodes=1:ppn=1,walltime=3:00:00
+#PBS -V
+#PBS -M yuw044@ucsd.edu
+#PBS -m a
+#PBS -A ren-group
+#PBS -j oe
+
+# make stat.txt for the Scrublet pipeline
+python $bin/generate.stat.txt.py /projects/ren-transposon/home/yangli/projects/CEMBA/00.data/archive/$j/$i/processed/stat.txt $gold/$i/dataset${k}/ground.truth.tsv
+
+# generate qc.filter.RData and qc.filter.meta.txt
+Rscript ${path1}/bin/snapATAC.qc.filter.R -i $gold/$i/dataset${k}/simulated.snap \
+                                        --tsse2depth $gold/$i/dataset${k}/stat.txt \
+                                        -o $gold/$i/dataset${k}/simulated \
+                                        --fragment_num 1 --tsse_cutoff 0 &> $gold/$i/log/qc.filter.$k.log
+
+# run the Scrublet pipeline
+Rscript $path2script/snapATAC.rmDoublets.R -i $gold/$i/dataset${k}/simulated.qc.filter.RData \
+                                                      --mat gmat --rate 0.08 \
+                                                      -o $gold/$i/dataset${k}/simulated.gmat &> $gold/$i/log/gmat.rmDoublets.$k.log; 
+
+Rscript $path2script/snapATAC.fitDoublets.R -i $gold/$i/dataset${k}/simulated.gmat.qc.cluster.RData \
+                                            -m $gold/$i/dataset${k}/simulated.gmat.rmDoublets.txt \
+                                            -o $gold/$i/dataset${k}/simulated.gmat &> $gold/$i/log/gmat.fitDoublets.$k.log
+
+" | sed '1d' > $qsub/scrublet_${i}_${k}.qsub
+
+qsub $qsub/scrublet_${i}_${k}.qsub -o $gold/$i/log/scrublet_${k}.log 
+done
+done
+```
 
 #### For the combined MOP datasets replications 1 and 2
 
-For each of the 40 simulated datasets, prepare AMULET input (the coordinate-sorted bam file) and run AMULET on each of them
+prepare AMULET input (the coordinate-sorted bam file) and run AMULET on each of them
 ```
 for j in rep1 rep2;
 do
