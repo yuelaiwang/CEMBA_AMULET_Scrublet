@@ -699,12 +699,70 @@ done
 
 #### For replications 1 and 2 of regions 2C, 3C, 4B, 5D (no UQ cutoff)
 
+PRC:
 
+```
+# store feather file for the PRC coordinate dataframe for simulated datasets without UQ cutoff from each CEMBA mop region
+for i in `cat $gold/cemba.mop.sample.lst` 
+do
+echo ${i}
+python $bin/calculate_prc_coordinates.py --end 10 $gold/${i}/dataset -f $gold/${i}/${i}_no_cutoff.feather
+done
+```
+
+AUPRC:
+
+```
+# calculate auPRC for simulated datasets from each CEMBA mop region
+for i in `cat $gold/cemba.mop.sample.lst`;
+do 
+echo ${i}
+rm $gold/${i}/prc.auc.txt
+python $bin/calculate_auprc.py $gold/${i}/dataset $gold/${i}/prc
+done
+```
+```
+# combine the prc.auc.txt for simulated datasets from each CEMBA mop region
+for i in `cat $gold/cemba.mop.sample.lst`;
+do 
+echo $i
+cat $gold/${i}/prc.auc.txt >> $gold/cemba.mop.prc.auc.txt
+done
+```
 
 #### For replications 1 and 2 of regions 2C, 3C, 4B, 5D (UQ between 1000 and 4000)
 
+PRC:
 
+```
+# store to a feather file for the PRC coordinate dataframe for simulated datasets with UQ cutoff 1000-4000 from each CEMBA mop region
+for i in `cat $gold/cemba.mop.sample.lst` 
+do
+echo ${i}
+python $bin/calculate_prc_coordinates.py --start 11 --end 20 $gold/${i}/dataset -f $gold/${i}/${i}_1000_4000.feather
+done
+```
+```
+# make a graph for UQ range 1000-4000 10-curve cemba mop simulated datasets
+Rscript $bin/make_prc_plot.R --labels $temp/data/simulated_datasets/simple.cemba.mop.sample.lst --dir $temp/data/simulated_datasets/feather_collection --samples $gold/cemba.mop.sample.lst --suffix _1000_4000.feather -o $temp/result/performance/cemba.mop.prc.1000_4000.pdf
+```
+
+AUPRC:
 
 #### For the combined MOP datasets replications 1 and 2
 
+PRC:
 
+AUPRC:
+
+```
+# store coordinate information to feather files for UQ-cutoff'ed simulated datasets from the combined CEMBA mop dataset
+for j in rep1 rep2
+do
+for ((i = 11; i <= 14; i ++))
+do 
+echo ${j}_dataset${i}
+python $bin/calculate_prc_coordinates.py --end 10 -f $cemba_mop/simulated_datasets_${j}/${j}_dataset${i}.feather $cemba_mop/simulated_datasets_${j}/dataset${i}_
+done
+done
+```
