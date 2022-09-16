@@ -69,7 +69,7 @@ First convert the snap file into an R data file and perform QC, filtering out ce
 Rscript /projects/ps-renlab/yangli/projects/CEMBA/00.data/szu/bin/snapATAC.qc.filter.R \
 -i /projects/ps-renlab/yangli/projects/CEMBA/00.data/4B/CEMBA180104_4B/CEMBA180104_4B.snap \
 --tsse2depth /projects/ren-transposon/home/yangli/projects/CEMBA/00.data/archive/4B/CEMBA180104_4B/processed/stat.txt \
--o /projects/ps-renlab/yuw044/projects/CEMBA/practice_doublet_removal/compare/gold_standard/CEMBA180104_4B/doublet_removal/Scrublet/CEMBA180104_4B --fragment_num 1000 --tsse_cutoff 10
+-o l --fragment_num 1000 --tsse_cutoff 10
 ```
 
 Then apply the modified Scrublet pipeline.
