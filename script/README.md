@@ -276,7 +276,7 @@ python3 /projects/ps-renlab/yuw044/apps/AMULET-v1.1_0124/AMULET.py --rfilter /ho
 
 samtools sort -n -@ 10 -m 1G $gold/$i/dataset${k}/simulated.bam -o $gold/$i/dataset${k}/simulated.nsrt.bam
 
-snaptools snap-pre --input-file=$gold/$i/dataset${k}/simulated.nsrt.bam --output-snap=$gold/$i/dataset${k}/simulated.snap --genome-name=mm10 --genome-size=$gold/CEMBA180104_4B_old/simulated_datasets2/mm10.chrom.sizes --min-mapq=30 --min-flen=50 --max-flen=1000 --keep-chrm=TRUE --keep-single=FALSE --keep-secondary=False --overwrite=True --max-num=20000 --min-cov=500 --verbose=True
+snaptools snap-pre --input-file=$gold/$i/dataset${k}/simulated.nsrt.bam --output-snap=$gold/$i/dataset${k}/simulated.snap --genome-name=mm10 --genome-size=$temp/data/simulated_datasets/mm10.chrom.sizes --min-mapq=30 --min-flen=50 --max-flen=1000 --keep-chrm=TRUE --keep-single=FALSE --keep-secondary=False --overwrite=True --max-num=20000 --min-cov=500 --verbose=True
 
 # add cell by bin matrix to the snap object
 snaptools snap-add-bmat \
@@ -391,7 +391,7 @@ echo -e "
 
 samtools sort -n -@ 10 -m 1G $gold/$i/dataset${k}/simulated.bam -o $gold/$i/dataset${k}/simulated.nsrt.bam
 
-snaptools snap-pre --input-file=$gold/$i/dataset${k}/simulated.nsrt.bam --output-snap=$gold/$i/dataset${k}/simulated.dedup.snap --genome-name=mm10 --genome-size=$gold/CEMBA180104_4B_old/simulated_datasets2/mm10.chrom.sizes --min-mapq=30 --min-flen=50 --max-flen=1000 --keep-chrm=TRUE --keep-single=FALSE --keep-secondary=False --overwrite=True --max-num=20000 --min-cov=500 --verbose=True
+snaptools snap-pre --input-file=$gold/$i/dataset${k}/simulated.nsrt.bam --output-snap=$gold/$i/dataset${k}/simulated.dedup.snap --genome-name=mm10 --genome-size=$temp/data/simulated_datasets/mm10.chrom.sizes --min-mapq=30 --min-flen=50 --max-flen=1000 --keep-chrm=TRUE --keep-single=FALSE --keep-secondary=False --overwrite=True --max-num=20000 --min-cov=500 --verbose=True
 
 # add cell by bin matrix to the snap object
 snaptools snap-add-bmat \
@@ -584,7 +584,7 @@ echo -e "
 samtools sort -n -@ 10 -m 1G $cemba_mop/simulated_datasets_$j/dataset${i}_${k}/simulated.bam -o $cemba_mop/simulated_datasets_$j/dataset${i}_${k}/simulated.nsrt.bam
 
 # convert the nsrt bam file(s) to snap file(s)
-snaptools snap-pre --input-file=$cemba_mop/simulated_datasets_$j/dataset${i}_${k}/simulated.nsrt.bam --output-snap=$cemba_mop/simulated_datasets_$j/dataset${i}_${k}/simulated.snap --genome-name=mm10 --genome-size=$gold/CEMBA180104_4B_old/simulated_datasets2/mm10.chrom.sizes --min-mapq=30 --min-flen=50 --max-flen=1000 --keep-chrm=TRUE --keep-single=FALSE --keep-secondary=False --overwrite=True --max-num=20000 --min-cov=500 --verbose=True
+snaptools snap-pre --input-file=$cemba_mop/simulated_datasets_$j/dataset${i}_${k}/simulated.nsrt.bam --output-snap=$cemba_mop/simulated_datasets_$j/dataset${i}_${k}/simulated.snap --genome-name=mm10 --genome-size=$temp/data/simulated_datasets/mm10.chrom.sizes --min-mapq=30 --min-flen=50 --max-flen=1000 --keep-chrm=TRUE --keep-single=FALSE --keep-secondary=False --overwrite=True --max-num=20000 --min-cov=500 --verbose=True
 
 # add cell by bin matrix to the snap object
 snaptools snap-add-bmat \
