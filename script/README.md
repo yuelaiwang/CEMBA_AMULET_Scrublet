@@ -50,8 +50,8 @@ cat <(samtools view -H $archive/$j/$i/processed/filtered_dedup.bam) <(samtools v
 cat /projects/ps-renlab/yuw044/projects/CEMBA/metatable.tsv | awk '(\$2 == \"$i\"){printf \"%s,%s\\\n\", \$3, \"1\"}' > $gold/$i/doublet_removal/AMULET/singlecell.csv
 
 # run AMULET 
-java -jar /projects/ps-renlab/yuw044/apps/AMULET-v1.1_0124/snATACOverlapCounter.jar --forcesorted --iscellidx 1 $gold/$i/doublet_removal/AMULET/filtered_dedup.srt.bam $gold/$i/doublet_removal/AMULET/singlecell.csv ~/projects/CEMBA/practice_doublet_removal/AMULET/testing_10D/input_data/mouse_autosomes.txt $gold/$i/doublet_removal/AMULET/ &> $gold/$i/doublet_removal/log/${i}_find_overlaps.log
-python3 /projects/ps-renlab/yuw044/apps/AMULET-v1.1_0124/AMULET.py --rfilter ~/projects/CEMBA/practice_doublet_removal/AMULET/testing_10D/input_data/mm10.blacklist.bed $gold/$i/doublet_removal/AMULET/Overlaps.txt $gold/$i/doublet_removal/AMULET/OverlapSummary.txt $gold/$i/doublet_removal/AMULET/ &> $gold/$i/doublet_removal/log/${i}_multiplet_detection.log
+java -jar /projects/ps-renlab/yuw044/apps/AMULET-v1.1_0124/snATACOverlapCounter.jar --forcesorted --iscellidx 1 $gold/$i/doublet_removal/AMULET/filtered_dedup.srt.bam $gold/$i/doublet_removal/AMULET/singlecell.csv /home/yuw044/projects/CEMBA/practice_doublet_removal/AMULET/testing_10D/input_data/mouse_autosomes.txt $gold/$i/doublet_removal/AMULET/ &> $gold/$i/doublet_removal/log/${i}_find_overlaps.log
+python3 /projects/ps-renlab/yuw044/apps/AMULET-v1.1_0124/AMULET.py --rfilter /home/yuw044/projects/CEMBA/practice_doublet_removal/AMULET/testing_10D/input_data/mm10.blacklist.bed $gold/$i/doublet_removal/AMULET/Overlaps.txt $gold/$i/doublet_removal/AMULET/OverlapSummary.txt $gold/$i/doublet_removal/AMULET/ &> $gold/$i/doublet_removal/log/${i}_multiplet_detection.log
 
 " | sed '1d' > $qsub/AMULET_${i}.qsub
 
@@ -270,9 +270,9 @@ mkdir $gold/$i/dataset${k}
 
 python $bin/simulate_cemba_doublets.py $gold/$i/doublet_removal/AMULET/filtered_dedup.srt.bam --poolsize 1100 --region $i --fclower 1000 --fchigher 4000 /projects/ps-renlab/yuw044/projects/CEMBA/metatable.tsv MajorType $gold/$i/doublet_removal/SingletBarcodes_01.txt $gold/$i/doublet_removal/AMULET/OverlapSummary.txt $gold/$i/dataset${k}
 
-java -jar /projects/ps-renlab/yuw044/apps/AMULET-v1.1_0124/snATACOverlapCounter.jar --forcesorted --bcidx 1 --cellidx 1 --iscellidx 2 $gold/$i/dataset${k}/simulated.bam $gold/$i/dataset${k}/simulated.singlecell.csv ~/projects/CEMBA/practice_doublet_removal/AMULET/testing_10D/input_data/mouse_autosomes.txt $gold/$i/dataset${k}/ &> $gold/$i/log/find_overlaps_$k.log
+java -jar /projects/ps-renlab/yuw044/apps/AMULET-v1.1_0124/snATACOverlapCounter.jar --forcesorted --bcidx 1 --cellidx 1 --iscellidx 2 $gold/$i/dataset${k}/simulated.bam $gold/$i/dataset${k}/simulated.singlecell.csv /home/yuw044/projects/CEMBA/practice_doublet_removal/AMULET/testing_10D/input_data/mouse_autosomes.txt $gold/$i/dataset${k}/ &> $gold/$i/log/find_overlaps_$k.log
 
-python3 /projects/ps-renlab/yuw044/apps/AMULET-v1.1_0124/AMULET.py --rfilter ~/projects/CEMBA/practice_doublet_removal/AMULET/testing_10D/input_data/mm10.blacklist.bed $gold/$i/dataset${k}/Overlaps.txt $gold/$i/dataset${k}/OverlapSummary.txt $gold/$i/dataset${k}/ &> $gold/$i/log/multiplet_detection_$k.log
+python3 /projects/ps-renlab/yuw044/apps/AMULET-v1.1_0124/AMULET.py --rfilter /home/yuw044/projects/CEMBA/practice_doublet_removal/AMULET/testing_10D/input_data/mm10.blacklist.bed $gold/$i/dataset${k}/Overlaps.txt $gold/$i/dataset${k}/OverlapSummary.txt $gold/$i/dataset${k}/ &> $gold/$i/log/multiplet_detection_$k.log
 
 samtools sort -n -@ 10 -m 1G $gold/$i/dataset${k}/simulated.bam -o $gold/$i/dataset${k}/simulated.nsrt.bam
 
@@ -358,9 +358,9 @@ echo -e "
 #PBS -A ren-group
 #PBS -j oe
 
-java -jar /projects/ps-renlab/yuw044/apps/AMULET-v1.1_0124/snATACOverlapCounter.jar --forcesorted --bcidx 1 --cellidx 1 --iscellidx 2 $gold/$i/dataset${k}/simulated.bam $gold/$i/dataset${k}/simulated.singlecell.csv ~/projects/CEMBA/practice_doublet_removal/AMULET/testing_10D/input_data/mouse_autosomes.txt $gold/$i/dataset${k}/ &> $gold/$i/log/find_overlaps_$k.log
+java -jar /projects/ps-renlab/yuw044/apps/AMULET-v1.1_0124/snATACOverlapCounter.jar --forcesorted --bcidx 1 --cellidx 1 --iscellidx 2 $gold/$i/dataset${k}/simulated.bam $gold/$i/dataset${k}/simulated.singlecell.csv /home/yuw044/projects/CEMBA/practice_doublet_removal/AMULET/testing_10D/input_data/mouse_autosomes.txt $gold/$i/dataset${k}/ &> $gold/$i/log/find_overlaps_$k.log
 
-python3 /projects/ps-renlab/yuw044/apps/AMULET-v1.1_0124/AMULET.py --rfilter ~/projects/CEMBA/practice_doublet_removal/AMULET/testing_10D/input_data/mm10.blacklist.bed $gold/$i/dataset${k}/Overlaps.txt $gold/$i/dataset${k}/OverlapSummary.txt $gold/$i/dataset${k}/ &> $gold/$i/log/multiplet_detection_$k.log
+python3 /projects/ps-renlab/yuw044/apps/AMULET-v1.1_0124/AMULET.py --rfilter /home/yuw044/projects/CEMBA/practice_doublet_removal/AMULET/testing_10D/input_data/mm10.blacklist.bed $gold/$i/dataset${k}/Overlaps.txt $gold/$i/dataset${k}/OverlapSummary.txt $gold/$i/dataset${k}/ &> $gold/$i/log/multiplet_detection_$k.log
 
 " | sed '1d' > $qsub/cemba_AMULET_${i}_${k}.qsub
 
@@ -547,9 +547,9 @@ samtools sort $cemba_mop/simulated_datasets_$j/dataset${i}_${k}/simulated.bam -o
 
 rm $cemba_mop/simulated_datasets_$j/dataset${i}_${k}/simulated.bam
 
-java -jar /projects/ps-renlab/yuw044/apps/AMULET-v1.1_0124/snATACOverlapCounter.jar --forcesorted --bcidx 1 --cellidx 1 --iscellidx 2 $cemba_mop/simulated_datasets_$j/dataset${i}_${k}/simulated.srt.bam $cemba_mop/simulated_datasets_$j/dataset${i}_${k}/simulated.singlecell.csv ~/projects/CEMBA/practice_doublet_removal/AMULET/testing_10D/input_data/mouse_autosomes.txt $cemba_mop/simulated_datasets_${j}/dataset${i}_${k}/ &> ${cemba_mop}/log/AMULET_${j}_${i}_${k}_find_overlaps.log
+java -jar /projects/ps-renlab/yuw044/apps/AMULET-v1.1_0124/snATACOverlapCounter.jar --forcesorted --bcidx 1 --cellidx 1 --iscellidx 2 $cemba_mop/simulated_datasets_$j/dataset${i}_${k}/simulated.srt.bam $cemba_mop/simulated_datasets_$j/dataset${i}_${k}/simulated.singlecell.csv /home/yuw044/projects/CEMBA/practice_doublet_removal/AMULET/testing_10D/input_data/mouse_autosomes.txt $cemba_mop/simulated_datasets_${j}/dataset${i}_${k}/ &> ${cemba_mop}/log/AMULET_${j}_${i}_${k}_find_overlaps.log
 
-python3 /projects/ps-renlab/yuw044/apps/AMULET-v1.1_0124/AMULET.py --rfilter ~/projects/CEMBA/practice_doublet_removal/AMULET/testing_10D/input_data/mm10.blacklist.bed $cemba_mop/simulated_datasets_${j}/dataset${i}_${k}/Overlaps.txt $cemba_mop/simulated_datasets_${j}/dataset${i}_${k}/OverlapSummary.txt $cemba_mop/simulated_datasets_${j}/dataset${i}_${k}/ &> ${cemba_mop}/log/AMULET_${j}_${i}_${k}_multiplet_detection.log
+python3 /projects/ps-renlab/yuw044/apps/AMULET-v1.1_0124/AMULET.py --rfilter /home/yuw044/projects/CEMBA/practice_doublet_removal/AMULET/testing_10D/input_data/mm10.blacklist.bed $cemba_mop/simulated_datasets_${j}/dataset${i}_${k}/Overlaps.txt $cemba_mop/simulated_datasets_${j}/dataset${i}_${k}/OverlapSummary.txt $cemba_mop/simulated_datasets_${j}/dataset${i}_${k}/ &> ${cemba_mop}/log/AMULET_${j}_${i}_${k}_multiplet_detection.log
 
 " | sed '1d' > $qsub/AMULET_${j}_${i}_${k}.qsub
 
