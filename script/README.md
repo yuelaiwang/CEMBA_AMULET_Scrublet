@@ -814,10 +814,9 @@ done
 AUPRC:
 
 ```
-# for simulated dataset rep1 from the combined mop datasets
-python $bin/auprc_to_tsv.py $cemba_mop/simulated_datasets_rep1/prc.auc.txt $cemba_mop/UQ.cutoff.sample.lst $gold/tools.lst $cemba_mop/simulated_datasets_rep1/prc.auc.tsv
-python $bin/auprc_to_tsv.py --ggplot $cemba_mop/simulated_datasets_rep1/prc.auc.txt $cemba_mop/UQ.cutoff.sample.lst $gold/tools.lst $cemba_mop/simulated_datasets_rep1/prc.auc.ggplot.tsv
-# for simulated dataset rep2 from the combined mop datasets
-python $bin/auprc_to_tsv.py $cemba_mop/simulated_datasets_rep2/prc.auc.txt $cemba_mop/UQ.cutoff.sample.lst $gold/tools.lst $cemba_mop/simulated_datasets_rep2/prc.auc.tsv
-python $bin/auprc_to_tsv.py --ggplot $cemba_mop/simulated_datasets_rep2/prc.auc.txt $cemba_mop/UQ.cutoff.sample.lst $gold/tools.lst $cemba_mop/simulated_datasets_rep2/prc.auc.ggplot.tsv
+# for simulated dataset rep1/rep2 from the combined mop datasets
+for i in rep1 rep2
+do
+python $bin/auprc_to_tsv.py --ggplot $cemba_mop/simulated_datasets_${i}/prc.auc.txt $cemba_mop/UQ.cutoff.sample.lst $gold/tools.lst $cemba_mop/simulated_datasets_${i}/prc.auc.ggplot.tsv
+done
 ```
