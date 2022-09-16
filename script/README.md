@@ -710,6 +710,11 @@ python $bin/calculate_prc_coordinates.py --end 10 $gold/${i}/dataset -f $gold/${
 done
 ```
 
+```
+# make a graph for no-cutoff 10-curve cemba mop simulated datasets
+Rscript $bin/make_prc_plot.R --labels $temp/data/simulated_datasets/simple.cemba.mop.sample.lst --dir $temp/data/simulated_datasets/feather_collection --samples $gold/cemba.mop.sample.lst --suffix _no_cutoff.feather -o $temp/result/performance/cemba.mop.prc.nocutoff.pdf
+```
+
 AUPRC:
 
 ```
@@ -729,7 +734,14 @@ echo $i
 cat $gold/${i}/prc.auc.txt >> $gold/cemba.mop.prc.auc.txt
 done
 ```
-
+```
+# for no cutoff simulated datasets, convert the prc.auc.txt files to tsv file that would later be given to the following R script
+python $bin/auprc_to_tsv.py --ggplot $gold/cemba.mop.prc.auc.txt $gold/cemba.mop.sample.lst $gold/tools.lst $gold/cemba.mop.prc.auc.ggplot.tsv
+```
+```
+# draw auprc boxplot and barplot for simulated datasets without UQ cutoff from each CEMBA mop region
+Rscript $bin/plot_auprc.R -i $gold/cemba.mop.prc.auc.ggplot.tsv --labels $temp/data/simulated_datasets/simple.cemba.mop.sample.lst --sig --bar -o $temp/result/performance/cemba.mop.auprc.nocutoff
+```
 #### For replications 1 and 2 of regions 2C, 3C, 4B, 5D (UQ between 1000 and 4000)
 
 PRC:
@@ -749,11 +761,35 @@ Rscript $bin/make_prc_plot.R --labels $temp/data/simulated_datasets/simple.cemba
 
 AUPRC:
 
+```
+# calculate auPRC for UQ range 1000-4000 simulated datasets from each CEMBA mop region (write to a single txt file)
+for i in `cat $gold/cemba.mop.sample.lst`
+do 
+echo ${i}
+python $bin/calculate_auprc.py --start 11 --end 20 $gold/${i}/dataset $gold/${i}/prc_UQ_1000_4000
+done
+done
+```
+```
+# make barplot for AUCs for UQ range 1000-4000 simulated datasets from each CEMBA mop region
+for i in `cat $gold/cemba.mop.sample.lst`
+do
+echo $i 
+cat $gold/${i}/prc_UQ_1000_4000.auc.txt >> $gold/cemba.mop.prc.auc.UQ_1000_4000.txt
+done
+```
+```
+# for UQ 1000-4000 simulated dataset, convert the prc.auc.txt files to tsv file that would later be given to the following R script
+python $bin/auprc_to_tsv.py --ggplot $gold/cemba.mop.prc.auc.UQ_1000_4000.txt $gold/cemba.mop.sample.lst $gold/tools.lst $gold/cemba.mop.prc.auc.UQ_1000_4000.ggplot.tsv
+```
+```
+# draw auprc boxplot and barplot for simulated datasets without UQ cutoff from each CEMBA mop region
+Rscript $bin/plot_auprc.R -i $gold/cemba.mop.prc.auc.UQ_1000_4000.ggplot.tsv --labels $temp/data/simulated_datasets/simple.cemba.mop.sample.lst --sig --bar -o $temp/result/performance/cemba.mop.auprc.UQ_1000_4000
+```
+
 #### For the combined MOP datasets replications 1 and 2
 
 PRC:
-
-AUPRC:
 
 ```
 # store coordinate information to feather files for UQ-cutoff'ed simulated datasets from the combined CEMBA mop dataset
@@ -765,4 +801,23 @@ echo ${j}_dataset${i}
 python $bin/calculate_prc_coordinates.py --end 10 -f $cemba_mop/simulated_datasets_${j}/${j}_dataset${i}.feather $cemba_mop/simulated_datasets_${j}/dataset${i}_
 done
 done
+```
+
+```
+# make a graph for UQ-cutoff'ed simulated datasets from the combined CEMBA mop dataset rep1
+for j in rep1 rep2
+do
+Rscript $bin/make_prc_plot.R --label $temp/data/simulated_datasets/cemba_mop_combined/uq.lst --row 1 --dir $temp/data/simulated_datasets/cemba_mop_combined/simulated_datasets_${j}/ --samples $temp/data/simulated_datasets/cemba_mop_combined/simulated_datasets_${j}/sample.lst --suffix .feather -o $temp/result/why_AMULET_not_good/${j}/cemba.mop.combined.${j}.prc.pdf
+done
+```
+
+AUPRC:
+
+```
+# for simulated dataset rep1 from the combined mop datasets
+python $bin/auprc_to_tsv.py $cemba_mop/simulated_datasets_rep1/prc.auc.txt $cemba_mop/UQ.cutoff.sample.lst $gold/tools.lst $cemba_mop/simulated_datasets_rep1/prc.auc.tsv
+python $bin/auprc_to_tsv.py --ggplot $cemba_mop/simulated_datasets_rep1/prc.auc.txt $cemba_mop/UQ.cutoff.sample.lst $gold/tools.lst $cemba_mop/simulated_datasets_rep1/prc.auc.ggplot.tsv
+# for simulated dataset rep2 from the combined mop datasets
+python $bin/auprc_to_tsv.py $cemba_mop/simulated_datasets_rep2/prc.auc.txt $cemba_mop/UQ.cutoff.sample.lst $gold/tools.lst $cemba_mop/simulated_datasets_rep2/prc.auc.tsv
+python $bin/auprc_to_tsv.py --ggplot $cemba_mop/simulated_datasets_rep2/prc.auc.txt $cemba_mop/UQ.cutoff.sample.lst $gold/tools.lst $cemba_mop/simulated_datasets_rep2/prc.auc.ggplot.tsv
 ```
