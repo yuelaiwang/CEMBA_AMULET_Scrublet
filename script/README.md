@@ -814,9 +814,27 @@ done
 AUPRC:
 
 ```
-# for simulated dataset rep1/rep2 from the combined mop datasets
+# calculate auPRC for UQ-cutoff'ed simulated datasets from the combined CEMBA mop dataset (write to a single txt file)
+for j in rep1 rep2
+do
+for ((i = 11; i <= 14; i ++))
+do 
+echo ${j}/dataset${i}
+python $bin/calculate_auprc.py $cemba_mop/simulated_datasets_${j}/dataset${i}_ $cemba_mop/simulated_datasets_${j}/prc
+done
+done
+```
+```
+# for simulated dataset rep1/rep2 from the combined mop datasets, convert the text files storing auprc to tsv files for R script plotting
 for i in rep1 rep2
 do
 python $bin/auprc_to_tsv.py --ggplot $cemba_mop/simulated_datasets_${i}/prc.auc.txt $cemba_mop/UQ.cutoff.sample.lst $gold/tools.lst $cemba_mop/simulated_datasets_${i}/prc.auc.ggplot.tsv
+done
+```
+```
+# draw auprc boxplot and barplot for UQ-cutoff'ed simulated datasets from the combined CEMBA mop dataset rep1/2
+for i in rep1 rep2
+do
+Rscript $bin/plot_auprc.R -f 7 -i $mop/${i}/prc.auc.ggplot.tsv --labels $temp/data/simulated_datasets/cemba_mop_combined/uq.lst --sig --bar -o $temp/result/why_AMULET_not_good/${i}/cemba.mop.combined.${i}.auprc
 done
 ```
