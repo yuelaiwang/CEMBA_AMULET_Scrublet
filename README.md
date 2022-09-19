@@ -7,14 +7,14 @@ In the whole project, we performed single-nucleus (sn)ATAC-seq assays using sing
 
 There are limited number of doublet removal tools developed specifically for snATAC-seq. Up to now, there are [SnapATAC](https://github.com/r3fang/SnapATAC), [ArchR](https://github.com/GreenleafLab/ArchR), and [AMULET](https://github.com/UcarLab/AMULET) for snATAC-seq doublet removal to the best of our knowledge. Researchers generally have been adopting algorithms from snRNA-seq doublet removal tools to achieve the same goal in snATAC-seq data.
 
-We modified [Scrublet](https://github.com/swolock/scrublet), a simulation-based doublet removal tool for snRNA-seq data, and applied it on our datasets. It turned out the its performance was basically satisfactory on our [previous dataset](https://www.nature.com/articles/s41586-021-03604-1#Sec16). 
+We modified [Scrublet](https://github.com/swolock/scrublet), a simulation-based doublet removal tool for snRNA-seq data, and applied it on our datasets. It turned out that its performance was basically satisfactory on our [previous datasets](https://www.nature.com/articles/s41586-021-03604-1#Sec16). 
 
 In 2021, [AMULET](https://github.com/UcarLab/AMULET), a read-count based doublet removal tool for snATAC-seq was published on Genome Biology. We believed that this novel tool could potentially outperform existing simulation-based packages including Scrublet and ArchR. As we hope to remove doublets more accurately, we compared the performance between [AMULET](https://github.com/UcarLab/AMULET) and our [modified](https://www.nature.com/articles/s41586-021-03604-1#Sec16) [Scrublet](https://github.com/swolock/scrublet) pipeline.
 
-**Our results show that [AMULET](https://github.com/UcarLab/AMULET) does not outperform the [modified](https://www.nature.com/articles/s41586-021-03604-1#Sec16) [Scrublet](https://github.com/swolock/scrublet) pipeline on our typical datasets. The reason is that AMULET does a best job on datasets sequenced deeply, like 25K median valid read pairs per nucleus, but that for our datasets is typically 3K~4K.**
+**Our results show that [AMULET](https://github.com/UcarLab/AMULET) does not outperform the [modified](https://www.nature.com/articles/s41586-021-03604-1#Sec16) [Scrublet](https://github.com/swolock/scrublet) pipeline on our typical datasets. The reason is that AMULET does a best job on datasets sequenced deeply, e.g. median valid read pairs per nucleus equal to 25K, but that for our datasets is typically 3K~4K.**
 
 ## Workflow
-In summary, we use our datasets to generate "simulated datasets" in which we know to our best capability if a barcode represents a singlet or a doublet. Then we apply both of the tools to each of the simulated datasets. We quantify the performance of a tool by plotting its precision-recall curve for distinguishing between singlets and doublets. We keep the example dataset in this repo very small just as a demo.
+In summary, we use our datasets to generate "simulated datasets" in which we know to our best capability if a barcode represents a singlet or a doublet (ground truth). Then we apply each tool respectively on each of the simulated datasets. Then the doublet removal results are compared with the ground truth. We quantify the performance of a tool by plotting its precision-recall curve for distinguishing between singlets and doublets. We keep the example dataset in this repo very small just as a demo.
 
 - [Step 1. Generate a singlet pool](#step-1-generate-a-singlet-pool)
 - [Step 2. Simulate datasets containing artificial doublets](#step-2-simulate-doublets)
@@ -23,7 +23,7 @@ In summary, we use our datasets to generate "simulated datasets" in which we kno
 
 ### Step 1. Generate a singlet pool
 
-We first obtain a pool of singlets applying AMULET and the modified Scrublet pipeline on a raw dataset and keeping the common singlets identified by both tools at their default level (excluding the union set of doublets called by both tools). Here we make an assumption that the common singlets are real singlets without doublets.
+We first obtain a pool of singlets by applying AMULET and the modified Scrublet pipeline on a raw dataset and keeping common singlets identified by both tools at their default levels (excluding the union set of doublets called by both tools). Here we make an assumption that the common singlets are ground truth singlets, i.e. the union set of doublets identified by both tools contains ground truth doublets.
 
 #### Identify AMULET doublets
 
@@ -100,7 +100,7 @@ The resulting file "SingletBarcodes_01.txt" will serve as the input to step 2.
 
 ### Step 2. Simulate doublets
 
-We introduce artificial doublets by randomly picking 2/11 of the nuclei in the dataset and forming nucleus pairs by adding their read count profiles together (repeated 10 times per dataset and thus generating 10 simulated dataset replicates). This will result in a doublet proportion of 10% in each simulated dataset. 
+We introduce artificial doublets by randomly picking 2/11 of the nuclei in the singlet pool, randomly pairing up 2 nuclei from the selected nuclei, and adding their read count profiles together for each pair (repeated 10 times per dataset and thus generating 10 simulated dataset replicates). This will result in a final doublet proportion of 10% in each simulated dataset. 
 
 To generate such datasets, use ```$temp/script/simulate_cemba_doublets.py``` and provide the following input arguments:
 
